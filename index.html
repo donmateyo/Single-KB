@@ -102,6 +102,7 @@
       border-radius: 10px;
       padding: 16px;
       margin-bottom: 16px;
+      border-left: 3px solid #8b2020;
     }
 
     .section-header {
@@ -116,7 +117,7 @@
     .section-title {
       font-weight: 700;
       font-size: 1rem;
-      color: #fff;
+      color: #c44040;
     }
 
     .round-controls {
@@ -149,8 +150,9 @@
     }
 
     .round-adj-btn:hover {
-      background: #333;
-      color: #fff;
+      background: #3a2020;
+      color: #d44;
+      border-color: #6b3030;
     }
 
     .round-adj-btn:disabled {
@@ -177,9 +179,9 @@
     }
 
     .round-tab.active {
-      background: #3a3a3a;
-      color: #fff;
-      border-color: #666;
+      background: #3a2525;
+      color: #e07070;
+      border-color: #6b3030;
     }
 
     .round-tab.completed {
@@ -234,17 +236,17 @@
       width: 100%;
       padding: 12px;
       margin-top: 8px;
-      background: #333;
-      color: #aaa;
-      border: none;
+      background: #2e1a1a;
+      color: #c44040;
+      border: 1px solid #4a2020;
       border-radius: 8px;
       font-size: 0.9rem;
       cursor: pointer;
     }
 
     .reset-btn:hover {
-      background: #3a3a3a;
-      color: #fff;
+      background: #3a2020;
+      color: #e05050;
     }
   </style>
 </head>
@@ -362,10 +364,7 @@
       },
     ];
 
-    // Track current round counts (can be adjusted)
     let roundCounts = workout.map((s) => s.rounds);
-
-    // state[sectionIndex][roundIndex][exerciseIndex] = true/false
     let state = buildState();
     let activeRound = workout.map(() => 0);
 
@@ -402,7 +401,6 @@
         const div = document.createElement("div");
         div.className = "section";
 
-        // header with +/- round controls
         const header = document.createElement("div");
         header.className = "section-header";
         header.innerHTML = `
@@ -423,7 +421,6 @@
         `;
         div.appendChild(header);
 
-        // round tabs
         const tabs = document.createElement("div");
         tabs.className = "round-tabs";
         for (let r = 0; r < roundCounts[si]; r++) {
@@ -440,7 +437,6 @@
         }
         div.appendChild(tabs);
 
-        // exercises for active round
         const r = activeRound[si];
         section.exercises.forEach((ex, ei) => {
           const row = document.createElement("div");
@@ -451,12 +447,9 @@
           cb.checked = state[si][r][ei];
           cb.addEventListener("change", () => {
             state[si][r][ei] = cb.checked;
-
-            // auto-start timer on first checkbox
             if (cb.checked && !timerRunning && elapsedSeconds === 0) {
               toggleTimer();
             }
-
             render();
           });
 
@@ -491,8 +484,6 @@
       );
       const pct = total ? (checked / total) * 100 : 0;
       document.getElementById("progress").style.width = pct + "%";
-
-      // auto-pause timer when workout complete
       if (pct === 100 && timerRunning) {
         toggleTimer();
       }
