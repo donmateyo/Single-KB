@@ -24,9 +24,24 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       font-size: 1.4rem;
       color: #fff;
+    }
+
+    .video-link {
+      display: block;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+      color: #666;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: color 0.15s;
+    }
+
+    .video-link:hover {
+      color: #c44040;
     }
 
     /* Timer */
@@ -252,6 +267,14 @@
 </head>
 <body>
   <h1>🏋️ Kettlebell Workout</h1>
+  <a
+    class="video-link"
+    href="https://youtu.be/29XU4Tdis4Y?si=X-oBKL1B5fRDa_wT"
+    target="_blank"
+    rel="noopener"
+  >
+    ▶ Watch the full routine
+  </a>
 
   <div class="timer-container">
     <div class="timer-display" id="timer">00:00:00</div>
