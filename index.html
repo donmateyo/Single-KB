@@ -19,15 +19,84 @@
       padding: 20px;
       max-width: 500px;
       margin: 0 auto;
+      padding-bottom: 100px;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 8px;
       font-size: 1.4rem;
       color: #fff;
     }
 
+    /* Timer */
+    .timer-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .timer-display {
+      font-size: 2.2rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .timer-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .timer-btn {
+      padding: 6px 20px;
+      border-radius: 20px;
+      border: 1px solid #444;
+      background: #252525;
+      color: #ccc;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .timer-btn:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    .timer-btn.running {
+      background: #2a3a2a;
+      color: #6fbf73;
+      border-color: #4a7a4a;
+    }
+
+    .timer-btn.paused {
+      background: #3a3525;
+      color: #d4a94b;
+      border-color: #7a6a3a;
+    }
+
+    /* Progress */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #6fbf73;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* Sections */
     .section {
       background: #252525;
       border-radius: 10px;
@@ -50,15 +119,50 @@
       color: #fff;
     }
 
-    .round-info {
+    .round-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .round-count {
       font-size: 0.8rem;
       color: #888;
+      min-width: 58px;
+      text-align: center;
+    }
+
+    .round-adj-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #444;
+      background: transparent;
+      color: #aaa;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .round-adj-btn:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    .round-adj-btn:disabled {
+      opacity: 0.25;
+      cursor: default;
     }
 
     .round-tabs {
       display: flex;
       gap: 6px;
       margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .round-tab {
@@ -69,6 +173,7 @@
       color: #aaa;
       font-size: 0.78rem;
       cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
 
     .round-tab.active {
@@ -124,23 +229,6 @@
       color: #555;
     }
 
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: #333;
-      border-radius: 3px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #6fbf73;
-      border-radius: 3px;
-      transition: width 0.3s ease;
-      width: 0%;
-    }
-
     .reset-btn {
       display: block;
       width: 100%;
@@ -162,17 +250,83 @@
 </head>
 <body>
   <h1>🏋️ Kettlebell Workout</h1>
-  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="timer-container">
+    <div class="timer-display" id="timer">00:00:00</div>
+    <div class="timer-buttons">
+      <button class="timer-btn" id="startPauseBtn" onclick="toggleTimer()">
+        Start
+      </button>
+      <button class="timer-btn" id="resetTimerBtn" onclick="resetTimer()">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
   <div id="app"></div>
   <button class="reset-btn" onclick="resetAll()">Reset Workout</button>
 
   <script>
+    // --- Timer ---
+    let timerInterval = null;
+    let elapsedSeconds = 0;
+    let timerRunning = false;
+
+    function formatTime(totalSec) {
+      const h = String(Math.floor(totalSec / 3600)).padStart(2, "0");
+      const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
+      const s = String(totalSec % 60).padStart(2, "0");
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById("timer").textContent =
+        formatTime(elapsedSeconds);
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById("startPauseBtn");
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.textContent = "Resume";
+        btn.classList.remove("running");
+        btn.classList.add("paused");
+      } else {
+        timerInterval = setInterval(() => {
+          elapsedSeconds++;
+          updateTimerDisplay();
+        }, 1000);
+        timerRunning = true;
+        btn.textContent = "Pause";
+        btn.classList.remove("paused");
+        btn.classList.add("running");
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      elapsedSeconds = 0;
+      updateTimerDisplay();
+      const btn = document.getElementById("startPauseBtn");
+      btn.textContent = "Start";
+      btn.classList.remove("running", "paused");
+    }
+
+    // --- Workout Data ---
     const workout = [
       {
         title: "Warm-Up",
         rounds: 2,
         exercises: [
-          { name: "Single-Kettlebell Halo", detail: "5-10 reps each direction" },
+          {
+            name: "Single-Kettlebell Halo",
+            detail: "5-10 reps each direction",
+          },
           { name: "Turkish Get Up", detail: "2 reps each side" },
         ],
       },
@@ -189,7 +343,10 @@
         rounds: 2,
         exercises: [
           { name: "Kettlebell Clean", detail: "5 reps each side" },
-          { name: "Single-Rack Kettlebell Squat", detail: "8 reps each side" },
+          {
+            name: "Single-Rack Kettlebell Squat",
+            detail: "8 reps each side",
+          },
           { name: "Kettlebell Push Press", detail: "5 reps each side" },
         ],
       },
@@ -205,15 +362,37 @@
       },
     ];
 
-    // state[sectionIndex][roundIndex][exerciseIndex] = true/false
-    let state = workout.map((s) =>
-      Array.from({ length: s.rounds }, () =>
-        Array(s.exercises.length).fill(false)
-      )
-    );
+    // Track current round counts (can be adjusted)
+    let roundCounts = workout.map((s) => s.rounds);
 
-    // activeRound[sectionIndex] = which round tab is shown
+    // state[sectionIndex][roundIndex][exerciseIndex] = true/false
+    let state = buildState();
     let activeRound = workout.map(() => 0);
+
+    function buildState() {
+      return workout.map((s, si) =>
+        Array.from({ length: roundCounts[si] }, () =>
+          Array(s.exercises.length).fill(false)
+        )
+      );
+    }
+
+    function addRound(si) {
+      if (roundCounts[si] >= 10) return;
+      roundCounts[si]++;
+      state[si].push(Array(workout[si].exercises.length).fill(false));
+      render();
+    }
+
+    function removeRound(si) {
+      if (roundCounts[si] <= 1) return;
+      roundCounts[si]--;
+      state[si].pop();
+      if (activeRound[si] >= roundCounts[si]) {
+        activeRound[si] = roundCounts[si] - 1;
+      }
+      render();
+    }
 
     function render() {
       const app = document.getElementById("app");
@@ -223,19 +402,31 @@
         const div = document.createElement("div");
         div.className = "section";
 
-        // header
+        // header with +/- round controls
         const header = document.createElement("div");
         header.className = "section-header";
         header.innerHTML = `
           <span class="section-title">${section.title}</span>
-          <span class="round-info">${section.rounds} Rounds</span>
+          <div class="round-controls">
+            <button
+              class="round-adj-btn"
+              onclick="removeRound(${si})"
+              ${roundCounts[si] <= 1 ? "disabled" : ""}
+            >−</button>
+            <span class="round-count">${roundCounts[si]} Round${roundCounts[si] > 1 ? "s" : ""}</span>
+            <button
+              class="round-adj-btn"
+              onclick="addRound(${si})"
+              ${roundCounts[si] >= 10 ? "disabled" : ""}
+            >+</button>
+          </div>
         `;
         div.appendChild(header);
 
         // round tabs
         const tabs = document.createElement("div");
         tabs.className = "round-tabs";
-        for (let r = 0; r < section.rounds; r++) {
+        for (let r = 0; r < roundCounts[si]; r++) {
           const tab = document.createElement("button");
           tab.className = "round-tab";
           tab.textContent = `Round ${r + 1}`;
@@ -260,6 +451,12 @@
           cb.checked = state[si][r][ei];
           cb.addEventListener("change", () => {
             state[si][r][ei] = cb.checked;
+
+            // auto-start timer on first checkbox
+            if (cb.checked && !timerRunning && elapsedSeconds === 0) {
+              toggleTimer();
+            }
+
             render();
           });
 
@@ -294,15 +491,18 @@
       );
       const pct = total ? (checked / total) * 100 : 0;
       document.getElementById("progress").style.width = pct + "%";
+
+      // auto-pause timer when workout complete
+      if (pct === 100 && timerRunning) {
+        toggleTimer();
+      }
     }
 
     function resetAll() {
-      state = workout.map((s) =>
-        Array.from({ length: s.rounds }, () =>
-          Array(s.exercises.length).fill(false)
-        )
-      );
+      roundCounts = workout.map((s) => s.rounds);
+      state = buildState();
       activeRound = workout.map(() => 0);
+      resetTimer();
       render();
     }
 
