@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kettlebell Workout</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 1.4rem;
+      color: #fff;
+    }
+
+    .section {
+      background: #252525;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #333;
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .round-info {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .round-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .round-tab {
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid #444;
+      background: transparent;
+      color: #aaa;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .round-tab.active {
+      background: #3a3a3a;
+      color: #fff;
+      border-color: #666;
+    }
+
+    .round-tab.completed {
+      background: #2a3a2a;
+      color: #6fbf73;
+      border-color: #4a7a4a;
+    }
+
+    .exercise {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+    }
+
+    .exercise + .exercise {
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .exercise input[type="checkbox"] {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: #6fbf73;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .exercise-info {
+      flex: 1;
+    }
+
+    .exercise-name {
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    .exercise-detail {
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .exercise.done .exercise-name,
+    .exercise.done .exercise-detail {
+      text-decoration: line-through;
+      color: #555;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #6fbf73;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .reset-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background: #333;
+      color: #aaa;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      background: #3a3a3a;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏋️ Kettlebell Workout</h1>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div id="app"></div>
+  <button class="reset-btn" onclick="resetAll()">Reset Workout</button>
+
+  <script>
+    const workout = [
+      {
+        title: "Warm-Up",
+        rounds: 2,
+        exercises: [
+          { name: "Single-Kettlebell Halo", detail: "5-10 reps each direction" },
+          { name: "Turkish Get Up", detail: "2 reps each side" },
+        ],
+      },
+      {
+        title: "CNS Prep",
+        rounds: 2,
+        exercises: [
+          { name: "Kettlebell Swing", detail: "5 reps" },
+          { name: "Basic Push-Ups", detail: "5 reps" },
+        ],
+      },
+      {
+        title: "Full Body Single-Kettlebell Workout",
+        rounds: 2,
+        exercises: [
+          { name: "Kettlebell Clean", detail: "5 reps each side" },
+          { name: "Single-Rack Kettlebell Squat", detail: "8 reps each side" },
+          { name: "Kettlebell Push Press", detail: "5 reps each side" },
+        ],
+      },
+      {
+        title: "Conditioning Finisher",
+        rounds: 2,
+        exercises: [
+          {
+            name: "Kettlebell Clean, Squat, & Press",
+            detail: "3 reps each side",
+          },
+        ],
+      },
+    ];
+
+    // state[sectionIndex][roundIndex][exerciseIndex] = true/false
+    let state = workout.map((s) =>
+      Array.from({ length: s.rounds }, () =>
+        Array(s.exercises.length).fill(false)
+      )
+    );
+
+    // activeRound[sectionIndex] = which round tab is shown
+    let activeRound = workout.map(() => 0);
+
+    function render() {
+      const app = document.getElementById("app");
+      app.innerHTML = "";
+
+      workout.forEach((section, si) => {
+        const div = document.createElement("div");
+        div.className = "section";
+
+        // header
+        const header = document.createElement("div");
+        header.className = "section-header";
+        header.innerHTML = `
+          <span class="section-title">${section.title}</span>
+          <span class="round-info">${section.rounds} Rounds</span>
+        `;
+        div.appendChild(header);
+
+        // round tabs
+        const tabs = document.createElement("div");
+        tabs.className = "round-tabs";
+        for (let r = 0; r < section.rounds; r++) {
+          const tab = document.createElement("button");
+          tab.className = "round-tab";
+          tab.textContent = `Round ${r + 1}`;
+          if (r === activeRound[si]) tab.classList.add("active");
+          if (state[si][r].every(Boolean)) tab.classList.add("completed");
+          tab.addEventListener("click", () => {
+            activeRound[si] = r;
+            render();
+          });
+          tabs.appendChild(tab);
+        }
+        div.appendChild(tabs);
+
+        // exercises for active round
+        const r = activeRound[si];
+        section.exercises.forEach((ex, ei) => {
+          const row = document.createElement("div");
+          row.className = "exercise" + (state[si][r][ei] ? " done" : "");
+
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = state[si][r][ei];
+          cb.addEventListener("change", () => {
+            state[si][r][ei] = cb.checked;
+            render();
+          });
+
+          const info = document.createElement("div");
+          info.className = "exercise-info";
+          info.innerHTML = `
+            <div class="exercise-name">${ex.name}</div>
+            <div class="exercise-detail">${ex.detail}</div>
+          `;
+
+          row.appendChild(cb);
+          row.appendChild(info);
+          div.appendChild(row);
+        });
+
+        app.appendChild(div);
+      });
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      let total = 0;
+      let checked = 0;
+      state.forEach((section) =>
+        section.forEach((round) =>
+          round.forEach((v) => {
+            total++;
+            if (v) checked++;
+          })
+        )
+      );
+      const pct = total ? (checked / total) * 100 : 0;
+      document.getElementById("progress").style.width = pct + "%";
+    }
+
+    function resetAll() {
+      state = workout.map((s) =>
+        Array.from({ length: s.rounds }, () =>
+          Array(s.exercises.length).fill(false)
+        )
+      );
+      activeRound = workout.map(() => 0);
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
