@@ -1,526 +1,2102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kettlebell Workout</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Premium kettlebell training PWA with custom timers, set tracking, and five professional routines.">
+<title>Kettlebell Pro — Single-Bell Training</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Kettlebell Pro","short_name":"KB Pro","start_url":".","display":"standalone","background_color":"#0a0a0a","theme_color":"#0a0a0a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2240%22 fill=%22%230a0a0a%22/%3E%3Ccircle cx=%2296%22 cy=%2296%22 r=%2240%22 fill=%22none%22 stroke=%22%23f59e0b%22 stroke-width=%228%22/%3E%3Crect x=%2288%22 y=%2230%22 width=%2216%22 height=%2220%22 rx=%224%22 fill=%22%23f59e0b%22/%3E%3Crect x=%2288%22 y=%22142%22 width=%2216%22 height=%2220%22 rx=%224%22 fill=%22%23f59e0b%22/%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --surface-3: #242424;
+    --border: #2a2a2a;
+    --text: #f5f5f5;
+    --text-dim: #8a8a8a;
+    --text-faint: #555;
+    --accent: #f59e0b;
+    --accent-dim: #b87908;
+    --accent-glow: rgba(245, 158, 11, 0.15);
+    --success: #22c55e;
+    --danger: #ef4444;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        sans-serif;
-      background: #1a1a1a;
-      color: #e0e0e0;
-      padding: 20px;
-      max-width: 500px;
-      margin: 0 auto;
-      padding-bottom: 100px;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 4px;
-      font-size: 1.4rem;
-      color: #fff;
-    }
+  html { font-size: 16px; }
 
-    .video-link {
-      display: block;
-      text-align: center;
-      margin-bottom: 12px;
-      font-size: 0.72rem;
-      color: #666;
-      text-decoration: none;
-      letter-spacing: 0.3px;
-      transition: color 0.15s;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: calc(90px + var(--safe-bottom));
+  }
 
-    .video-link:hover {
-      color: #c44040;
-    }
+  /* ===== HEADER ===== */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding-top: var(--safe-top);
+  }
 
-    /* Timer */
-    .timer-container {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    gap: 12px;
+  }
 
-    .timer-display {
-      font-size: 2.2rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: #fff;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+  }
 
-    .timer-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
 
-    .timer-btn {
-      padding: 6px 20px;
-      border-radius: 20px;
-      border: 1px solid #444;
-      background: #252525;
-      color: #ccc;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
 
-    .timer-btn:hover {
-      background: #333;
-      color: #fff;
-    }
+  .icon-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.1rem;
+  }
 
-    .timer-btn.running {
-      background: #2a3a2a;
-      color: #6fbf73;
-      border-color: #4a7a4a;
-    }
+  .icon-btn:hover, .icon-btn:active {
+    background: var(--surface-3);
+    color: var(--text);
+    border-color: var(--accent-dim);
+  }
 
-    .timer-btn.paused {
-      background: #3a3525;
-      color: #d4a94b;
-      border-color: #7a6a3a;
-    }
+  /* ===== ROUTINE TABS ===== */
+  .routine-nav {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    /* Progress */
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: #333;
-      border-radius: 3px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
+  .routine-nav::-webkit-scrollbar { display: none; }
 
-    .progress-fill {
-      height: 100%;
-      background: #6fbf73;
-      border-radius: 3px;
-      transition: width 0.3s ease;
-      width: 0%;
-    }
+  .routine-tab {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
-    /* Sections */
-    .section {
-      background: #252525;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-left: 3px solid #8b2020;
-    }
+  .routine-tab:hover { color: var(--text); border-color: var(--surface-3); }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #333;
-    }
+  .routine-tab.active {
+    background: var(--accent);
+    color: #0a0a0a;
+    border-color: var(--accent);
+  }
 
-    .section-title {
-      font-weight: 700;
-      font-size: 1rem;
-      color: #c44040;
-    }
+  .routine-tab .tab-num {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-weight: 800;
+  }
 
-    .round-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+  .routine-tab.active .tab-num { opacity: 0.5; }
 
-    .round-count {
-      font-size: 0.8rem;
-      color: #888;
-      min-width: 58px;
-      text-align: center;
-    }
+  /* ===== MAIN ===== */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
 
-    .round-adj-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 1px solid #444;
-      background: transparent;
-      color: #aaa;
-      font-size: 1rem;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s;
-    }
+  .routine-view { display: none; animation: fadeIn 0.3s ease; }
+  .routine-view.active { display: block; }
 
-    .round-adj-btn:hover {
-      background: #3a2020;
-      color: #d44;
-      border-color: #6b3030;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .round-adj-btn:disabled {
-      opacity: 0.25;
-      cursor: default;
-    }
+  /* ===== ROUTINE HEADER ===== */
+  .routine-header {
+    margin-bottom: 20px;
+  }
 
-    .round-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
+  .routine-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
 
-    .round-tab {
-      padding: 4px 14px;
-      border-radius: 20px;
-      border: 1px solid #444;
-      background: transparent;
-      color: #aaa;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
+  .routine-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
 
-    .round-tab.active {
-      background: #3a2525;
-      color: #e07070;
-      border-color: #6b3030;
-    }
+  .routine-subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
 
-    .round-tab.completed {
-      background: #2a3a2a;
-      color: #6fbf73;
-      border-color: #4a7a4a;
-    }
+  .routine-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 
-    .exercise {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 8px 0;
-    }
+  .meta-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-    .exercise + .exercise {
-      border-top: 1px solid #2a2a2a;
-    }
+  .meta-chip svg { width: 14px; height: 14px; opacity: 0.7; }
 
-    .exercise input[type="checkbox"] {
-      margin-top: 3px;
-      width: 18px;
-      height: 18px;
-      accent-color: #6fbf73;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
+  /* ===== CONTROLS BAR ===== */
+  .controls-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: stretch;
+  }
 
-    .exercise-info {
-      flex: 1;
-    }
+  .workout-timer-display {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-    .exercise-name {
-      font-size: 0.92rem;
-      font-weight: 500;
-    }
+  .workout-timer-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 700;
+  }
 
-    .exercise-detail {
-      font-size: 0.78rem;
-      color: #888;
-      margin-top: 2px;
-    }
+  .workout-timer-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
 
-    .exercise.done .exercise-name,
-    .exercise.done .exercise-detail {
-      text-decoration: line-through;
-      color: #555;
-    }
+  .workout-timer-value.running { color: var(--accent); }
 
-    .reset-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      background: #2e1a1a;
-      color: #c44040;
-      border: 1px solid #4a2020;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
+  .start-stop-btn {
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0 24px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+    justify-content: center;
+  }
 
-    .reset-btn:hover {
-      background: #3a2020;
-      color: #e05050;
-    }
-  </style>
+  .start-stop-btn:hover { background: #fbbf24; transform: translateY(-1px); }
+  .start-stop-btn:active { transform: translateY(0); }
+
+  .start-stop-btn.running {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  .start-stop-btn.running:hover { background: #dc2626; }
+
+  .start-stop-btn svg { width: 16px; height: 16px; }
+
+  /* ===== EXERCISE LIST ===== */
+  .exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+
+  .exercise-card.completed {
+    border-color: var(--success);
+    opacity: 0.6;
+  }
+
+  .exercise-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+
+  .exercise-num {
+    background: var(--surface-3);
+    color: var(--accent);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .exercise-card.completed .exercise-num {
+    background: var(--success);
+    color: #0a0a0a;
+  }
+
+  .exercise-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .exercise-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+
+  .exercise-notes {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .exercise-toggle {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    padding: 4px;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .exercise-toggle:hover { color: var(--text); }
+  .exercise-toggle svg { transition: transform 0.2s; }
+  .exercise-card.expanded .exercise-toggle svg { transform: rotate(180deg); }
+
+  .exercise-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
+
+  .exercise-card.expanded .exercise-body { display: block; }
+
+  .exercise-detail {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    padding-top: 12px;
+  }
+
+  /* ===== SET TRACKING ===== */
+  .set-tracker {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .set-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+
+  .set-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-faint);
+    width: 36px;
+    flex-shrink: 0;
+  }
+
+  .set-input-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .set-input-group label {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .set-input {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 0.82rem;
+    width: 52px;
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .set-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .set-check {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    background: var(--surface-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .set-check:hover { border-color: var(--accent); }
+
+  .set-check.done {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .set-check.done svg { opacity: 1; }
+  .set-check svg { width: 16px; height: 16px; opacity: 0; transition: var(--transition); }
+
+  .rest-trigger {
+    background: var(--accent-glow);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rest-trigger:hover { background: var(--accent); color: #0a0a0a; }
+  .rest-trigger svg { width: 12px; height: 12px; }
+
+  /* ===== CIRCUIT / SPECIAL FORMATS ===== */
+  .circuit-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .circuit-round-display {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .circuit-round-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 700;
+  }
+
+  .circuit-round-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+  }
+
+  .circuit-round-value span { color: var(--text-faint); font-size: 1.2rem; }
+
+  .circuit-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .circuit-exercise {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+
+  .circuit-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: 2px solid var(--border);
+    background: var(--surface-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .circuit-check.done { background: var(--success); border-color: var(--success); }
+  .circuit-check svg { width: 14px; height: 14px; opacity: 0; }
+  .circuit-check.done svg { opacity: 1; }
+
+  .circuit-exercise-info { flex: 1; }
+  .circuit-exercise-name { font-size: 0.85rem; font-weight: 600; }
+  .circuit-exercise-reps { font-size: 0.75rem; color: var(--text-dim); }
+
+  .circuit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .circuit-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .circuit-btn.primary { background: var(--accent); color: #0a0a0a; }
+  .circuit-btn.primary:hover { background: #fbbf24; }
+  .circuit-btn.secondary { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border); }
+  .circuit-btn.secondary:hover { color: var(--text); }
+
+  /* ===== LADDER DISPLAY ===== */
+  .ladder-progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .ladder-rung {
+    flex: 1;
+    min-width: 60px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .ladder-rung:hover { border-color: var(--accent-dim); }
+  .ladder-rung.done { background: var(--success); border-color: var(--success); opacity: 0.7; }
+  .ladder-rung.current { border-color: var(--accent); background: var(--accent-glow); }
+
+  .ladder-rung-num { font-size: 0.7rem; color: var(--text-faint); font-weight: 700; }
+  .ladder-rung.done .ladder-rung-num { color: #0a0a0a; opacity: 0.7; }
+  .ladder-rung-reps { font-size: 1rem; font-weight: 800; }
+  .ladder-rung.done .ladder-rung-reps { color: #0a0a0a; }
+
+  /* ===== BOTTOM TIMER BAR ===== */
+  .timer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px calc(12px + var(--safe-bottom));
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .timer-bar.visible { transform: translateY(0); }
+
+  .timer-bar-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .rest-timer-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rest-timer-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 700;
+  }
+
+  .rest-timer-value {
+    font-size: 2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .rest-timer-value.done { color: var(--success); }
+
+  .rest-progress-bar {
+    height: 4px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .rest-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s linear;
+    width: 100%;
+  }
+
+  .rest-progress-fill.done { background: var(--success); }
+
+  .timer-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .timer-btn {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .timer-btn:hover { border-color: var(--accent); }
+  .timer-btn svg { width: 18px; height: 18px; }
+
+  .timer-btn.danger { color: var(--danger); }
+
+  .timer-adjust {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .timer-adjust-btn {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .timer-adjust-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  /* ===== PROGRESS SECTION ===== */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .progress-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+
+  .progress-percent {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--surface-3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ===== INFO SECTION ===== */
+  .info-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .info-section h3 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .info-section p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .info-section p:last-child { margin-bottom: 0; }
+
+  .info-section ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .info-section li {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .info-section li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+  }
+
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 720px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 20px 20px calc(20px + var(--safe-bottom));
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .settings-group {
+    margin-bottom: 20px;
+  }
+
+  .settings-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-faint);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .weight-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .weight-option {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .weight-option:hover { color: var(--text); }
+  .weight-option.active { background: var(--accent); color: #0a0a0a; border-color: var(--accent); }
+
+  .rest-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .rest-preset {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .rest-preset:hover { color: var(--text); }
+  .rest-preset.active { background: var(--accent); color: #0a0a0a; border-color: var(--accent); }
+
+  .modal-close {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .modal-close:hover { background: #fbbf24; }
+
+  .danger-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius);
+    padding: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: var(--transition);
+  }
+
+  .danger-btn:hover { background: var(--danger); color: #fff; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: calc(100px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 400;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+
+  .toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { border-color: var(--success); }
+  .toast.error { border-color: var(--danger); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .routine-title { font-size: 1.35rem; }
+    .workout-timer-value { font-size: 1.25rem; }
+    .start-stop-btn { padding: 0 16px; min-width: 90px; font-size: 0.82rem; }
+    .set-input { width: 44px; }
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border); }
+</style>
 </head>
 <body>
-  <h1>🏋️ Kettlebell Workout</h1>
-  <a
-    class="video-link"
-    href="https://youtu.be/29XU4Tdis4Y?si=X-oBKL1B5fRDa_wT"
-    target="_blank"
-    rel="noopener"
-  >
-    ▶ Watch the full routine
-  </a>
 
-  <div class="timer-container">
-    <div class="timer-display" id="timer">00:00:00</div>
-    <div class="timer-buttons">
-      <button class="timer-btn" id="startPauseBtn" onclick="toggleTimer()">
-        Start
-      </button>
-      <button class="timer-btn" id="resetTimerBtn" onclick="resetTimer()">
-        Reset
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="9" stroke="#f59e0b" stroke-width="2.5"/>
+        <rect x="13" y="3" width="6" height="5" rx="1.5" fill="#f59e0b"/>
+        <rect x="13" y="24" width="6" height="5" rx="1.5" fill="#f59e0b"/>
+        <path d="M13 8 L13 11 M19 8 L19 11 M13 21 L13 24 M19 21 L19 24" stroke="#f59e0b" stroke-width="2"/>
+      </svg>
+      <span>Kettlebell Pro</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
       </button>
     </div>
   </div>
+  <nav class="routine-nav" id="routineNav"></nav>
+</header>
 
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress"></div>
+<main id="main"></main>
+
+<!-- Bottom Timer Bar -->
+<div class="timer-bar" id="timerBar">
+  <div class="timer-bar-inner">
+    <div class="rest-timer-display">
+      <span class="rest-timer-label">Rest Timer</span>
+      <span class="rest-timer-value" id="restTimerValue">0:00</span>
+      <div class="rest-progress-bar">
+        <div class="rest-progress-fill" id="restProgressFill"></div>
+      </div>
+      <div class="timer-adjust">
+        <button class="timer-adjust-btn" onclick="adjustRest(-15)">−15s</button>
+        <button class="timer-adjust-btn" onclick="adjustRest(-5)">−5s</button>
+        <button class="timer-adjust-btn" onclick="adjustRest(5)">+5s</button>
+        <button class="timer-adjust-btn" onclick="adjustRest(15)">+15s</button>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn" id="restPauseBtn" onclick="toggleRestPause()" aria-label="Pause">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      </button>
+      <button class="timer-btn danger" onclick="closeRestTimer()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
-  <div id="app"></div>
-  <button class="reset-btn" onclick="resetAll()">Reset Workout</button>
+</div>
 
-  <script>
-    // --- Timer ---
-    let timerInterval = null;
-    let elapsedSeconds = 0;
-    let timerRunning = false;
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 class="modal-title">Settings</h2>
 
-    function formatTime(totalSec) {
-      const h = String(Math.floor(totalSec / 3600)).padStart(2, "0");
-      const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
-      const s = String(totalSec % 60).padStart(2, "0");
-      return `${h}:${m}:${s}`;
+    <div class="settings-group">
+      <div class="settings-label">Default Rest Duration</div>
+      <div class="rest-presets" id="restPresets">
+        <button class="rest-preset" data-rest="30">30s</button>
+        <button class="rest-preset" data-rest="45">45s</button>
+        <button class="rest-preset active" data-rest="60">60s</button>
+        <button class="rest-preset" data-rest="90">90s</button>
+        <button class="rest-preset" data-rest="120">2m</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">Your Kettlebell Weight</div>
+      <div class="weight-selector" id="weightSelector">
+        <button class="weight-option" data-weight="8">8 kg</button>
+        <button class="weight-option" data-weight="12">12 kg</button>
+        <button class="weight-option" data-weight="16">16 kg</button>
+        <button class="weight-option" data-weight="20">20 kg</button>
+        <button class="weight-option" data-weight="24">24 kg</button>
+        <button class="weight-option" data-weight="28">28 kg</button>
+        <button class="weight-option" data-weight="32">32 kg</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">Sound on Rest Complete</div>
+      <div class="weight-selector">
+        <button class="weight-option active" data-sound="on">On</button>
+        <button class="weight-option" data-sound="off">Off</button>
+      </div>
+    </div>
+
+    <button class="modal-close" onclick="closeSettings()">Done</button>
+    <button class="danger-btn" onclick="resetAllProgress()">Reset All Progress</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== ROUTINE DATA =====
+const ROUTINES = [
+  {
+    id: 'r1',
+    num: '1',
+    name: 'Total-Body Strength Builder',
+    badge: 'Maximum Strength & Muscle',
+    subtitle: 'A comprehensive program targeting every movement pattern: hinge, squat, push, pull, carry, and overhead stability.',
+    duration: '~30 min',
+    rest: '60-90s',
+    frequency: '3-4x / week',
+    type: 'sets',
+    exercises: [
+      { name: 'Turkish Get-Up', sets: 2, reps: '5', perSide: true, notes: 'Move slowly with control; keep eyes on bell throughout', detail: 'This exercise alone activates shoulders, core, hips, and stability musculature. Perform each repetition as a separate, deliberate practice rather than rushing through the movement. If unfamiliar, practice the sequence without load first.' },
+      { name: 'Suitcase Deadlift', sets: 3, reps: '6', perSide: true, notes: 'Keep shoulders level; resist lateral flexion', detail: 'Hold the kettlebell on one side like a suitcase. Hinge at the hips, keeping your spine neutral. The offset load trains anti-lateral flexion.' },
+      { name: 'Half-Kneeling Single-Arm Press', sets: 3, reps: '8', perSide: true, notes: 'Squeeze glute of down knee; press in vertical line', detail: 'Kneel on one knee with the other foot forward. Press the kettlebell overhead in a straight vertical line. The half-kneeling position demands core stability.' },
+      { name: 'Goblet Squat', sets: 2, reps: '12', perSide: false, notes: 'Hold bell at chest; keep torso upright throughout', detail: 'Hold the kettlebell by the horns at chest height. Squat to full depth, driving knees out and keeping your chest proud.' },
+      { name: 'Bent-Over Row', sets: 2, reps: '12', perSide: true, notes: 'Flat back; pull elbow along ribcage to hip', detail: 'Hinge forward with a flat back. Row the kettlebell to your hip, squeezing the shoulder blade. Control the descent.' },
+      { name: "Farmer's Carry (Suitcase)", sets: 3, reps: '20 paces', perSide: true, notes: 'Walk tall; minimize lateral lean under load', detail: 'Carry the kettlebell on one side. Walk with purpose, keeping your shoulders level and core engaged. This builds grip and anti-lateral flexion strength.' },
+      { name: 'Kettlebell Swing', sets: 1, reps: '50', perSide: false, notes: 'Complete in as few sets as possible; hip hinge power', detail: 'The 50-rep swing finisher should be performed in as few sets as possible. Beginners may use 5 sets of 10; advanced trainees should aim for 2-3 sets. Rest only as needed between mini-sets.' }
+    ],
+    why: 'The Turkish Get-Up provides comprehensive joint stability and motor control under load. Combined with bilateral and unilateral hinge, squat, and pulling movements, this is the closest approximation to a complete gym strength session achievable with a single implement. The suitcase carry develops anti-lateral flexion strength critical for spinal health and athletic performance.',
+    progression: [
+      'Weeks 1-2: Establish form at prescribed weights. Record video for self-assessment.',
+      'Weeks 3-4: Reduce rest to 45-60 seconds. Add 2 reps to each set of pressing movements.',
+      'Weeks 5-6: Complete the 50 swings in 2 sets of 25. Add a fourth set to Suitcase Deadlifts.',
+      'Week 7+: Increase kettlebell weight by one standard increment and return to base protocol.'
+    ]
+  },
+  {
+    id: 'r2',
+    num: '2',
+    name: 'Spartan OCR Circuit',
+    badge: 'Athletic Conditioning & OCR Prep',
+    subtitle: 'Adapted from Spartan Race training methodologies. Short, intense rounds build work capacity, grip endurance, and mental resilience.',
+    duration: '25-30 min',
+    rest: '2 min between rounds',
+    frequency: '2-3x / week',
+    type: 'circuit',
+    totalRounds: 5,
+    exercises: [
+      { name: '200-meter Run', reps: '200m', detail: 'Moderate-to-fast pace. If weather or space prevents outdoor running, substitute high-knees in place for 45 seconds, jump rope (100 double-leg turns), or burpees (8 reps).' },
+      { name: 'Kettlebell Clean & Press', reps: '2 / side', detail: 'The kettlebell clean brings the bell from the floor to the rack position in one explosive motion. From the rack, strict-press overhead without leg drive. Lower with control. Reset the hinge between reps if needed.' },
+      { name: 'Goblet Squat', reps: '5 reps', detail: 'Hold bell at chest; keep torso upright throughout. Full depth squat with powerful hip extension.' },
+      { name: 'Two-Handed Kettlebell Swing', reps: '20 reps', detail: 'Hip hinge power. Snap the hips forward to drive the bell to chest height. Do not lift with your arms.' }
+    ],
+    why: 'This circuit combines ballistic power (swings), strength under fatigue (clean & press), leg endurance (squats), and cardiovascular demand (running) in a sequence that mimics real-world athletic and tactical demands. The repeated transitions between lifting and running develop the specific work capacity required for obstacle course racing, combat sports, and emergency response scenarios.',
+    progression: [
+      'Weeks 1-2: Perform all 5 rounds at base tempo. Focus on movement quality during fatigued states.',
+      'Weeks 3-4: Reduce rest between rounds to 90 seconds. Maintain consistent round times.',
+      'Weeks 5-6: Reduce rest to 60 seconds. Increase Clean & Press to 3 reps per side.',
+      'Week 7+: Add a 6th round, or upgrade kettlebell weight and return to 5 rounds with 90-second rest.'
+    ]
+  },
+  {
+    id: 'r3',
+    num: '3',
+    name: 'One-Arm Flying Eagle',
+    badge: 'Grip Strength & Mental Toughness',
+    subtitle: "Based on Dan John's legendary Eagle challenge, modified for a single kettlebell. A grip and core stability crusher performed unbroken.",
+    duration: '20-25 min',
+    rest: 'Minimal (hand switch only)',
+    frequency: '1-2x / week',
+    type: 'eagle',
+    totalRounds: 3,
+    exercises: [
+      { name: 'Suitcase Carry', reps: '20m', detail: 'Carry the kettlebell on one side. Walk tall, resisting lateral lean.' },
+      { name: 'One-Arm Front Squat', reps: '1 rep', detail: 'Clean the kettlebell to the rack position. Squat to full depth maintaining an upright torso. The offset load creates significant anti-rotational demand on the core.' },
+      { name: 'Suitcase Carry', reps: '20m', detail: 'Continue carrying without setting the bell down.' },
+      { name: 'One-Arm Front Squat', reps: '2 reps', detail: 'Two reps on the same side. Maintain rack position throughout.' },
+      { name: 'Suitcase Carry', reps: '20m', detail: 'Third carry segment. Grip is fatiguing — stay focused.' },
+      { name: 'One-Arm Front Squat', reps: '3 reps', detail: 'Final three squats before switching hands. The defining feature: the kettlebell does not touch the ground between the start of the first carry and the completion of the final squat on the opposite hand.' }
+    ],
+    why: 'The asymmetrical loading of the suitcase carry and one-arm front squat forces intense core engagement to resist lateral flexion and rotation. The accumulation of loaded carries combined with squats without rest builds exceptional grip endurance and leg strength under significant fatigue. This routine develops the specific capacity to hold, carry, and maneuver under load — the foundational skills of tactical and occupational strength.',
+    progression: [
+      'Week 1: Complete 3 rounds per hand. Use a weight you can hold for the full duration.',
+      'Week 2: Increase to 4 rounds per hand with the same weight.',
+      'Week 3: Progress to 5 rounds per hand. If completed unbroken, increase weight.',
+      'Week 4+: Increase carry distance to 25 meters per carry, or add 1-2-3-4 rep scheme.'
+    ]
+  },
+  {
+    id: 'r4',
+    num: '4',
+    name: 'Beginner-to-Intermediate Mastery Flow',
+    badge: 'Technique & Movement Quality',
+    subtitle: "From Onnit's John Wolf. Designed to teach the five essential movement patterns while remaining challenging for advanced athletes.",
+    duration: '25-30 min',
+    rest: '60s between rounds',
+    frequency: '3x / week',
+    type: 'flow',
+    totalRounds: 3,
+    exercises: [
+      { name: 'Goblet Squat', reps: '8-12', detail: 'Elbows inside knees at bottom; chest proud. Full depth squat with upright torso.' },
+      { name: 'Split-Stance Row', reps: '8-12 / side', detail: 'Hinge forward 45 degrees; row to hip pocket. Staggered stance position.' },
+      { name: 'One-Arm Strict Press', reps: '6-10 / side', detail: 'No leg drive; press in straight vertical line. Standing position with locked core.' },
+      { name: 'Chest-Loaded Swing', reps: '10', detail: 'Hold bell at chest; explosive hip extension. Different from standard swing — starts from chest.' },
+      { name: 'Shoulder Halo', reps: '10 / direction', detail: 'Keep bell close to head; move from shoulder girdle. Rotational control exercise developing mobility and stability.' },
+      { name: 'Hip Halo', reps: '10 / direction', detail: 'Rotate around hips; maintain soft knees. Develops hip mobility and rotational control.' },
+      { name: 'Figure-8 Pass', reps: '10 / direction', detail: 'Trace figure-8 pattern through legs; stay low. Develops coordination, hip mobility, and hand transitions.' }
+    ],
+    why: 'The inclusion of halo movements and figure-8 passes explicitly trains rotational control and anti-rotation — movement qualities that are underdeveloped in most linear strength programs but essential for injury prevention and athletic performance. By combining these skill elements with fundamental strength movements (squat, press, row, swing), this routine develops movement literacy that transfers to every other kettlebell exercise and to real-world physical demands.',
+    progression: [
+      'Weeks 1-2: Perform 3 rounds at the lower end of rep ranges. Focus entirely on movement quality.',
+      'Weeks 3-4: Increase to 4 rounds. Progress to the upper end of rep ranges for all exercises.',
+      'Weeks 5-6: Add 2 reps to each exercise. Time your rounds and attempt to match pace each round.',
+      'Week 7+: Increase kettlebell weight. Return to 3 rounds at lower rep ranges and rebuild.'
+    ]
+  },
+  {
+    id: 'r5',
+    num: '5',
+    name: 'Descending Ladder Finisher',
+    badge: 'Fat Loss & Work Capacity',
+    subtitle: 'A simple but brutal two-exercise descending ladder. Fast, effective, and designed to leave nothing in the tank.',
+    duration: '15-20 min',
+    rest: 'As needed',
+    frequency: '2-3x / week',
+    type: 'ladder',
+    exercises: [
+      { name: 'Goblet Squats', reps: '20→2', detail: 'Goblet squats must reach full depth (hip crease below knee). Do not sacrifice form for speed.' },
+      { name: 'Kettlebell Swings', reps: '20→2', detail: 'Kettlebell swings must reach chest height with a powerful hip snap. Partial squats and arm-lifted swings both reduce effectiveness and increase injury risk.' }
+    ],
+    ladderRungs: [20, 18, 16, 14, 12, 10, 8, 6, 4, 2],
+    why: 'The squat-to-swing pairing creates a sustained heart-rate elevation that does not recover between movements. Research from the University of Wisconsin demonstrated that kettlebell snatch-style protocols burn approximately 20 calories per minute and maintain 86-99% of maximum heart rate throughout the session. This descending ladder delivers comparable metabolic stress through a simpler, more accessible movement pair available to trainees at any skill level.',
+    progression: [
+      'Week 1: Complete the full 20-to-2 ladder. Record total completion time.',
+      'Week 2: Target a 10% reduction in total completion time using the same weight.',
+      'Week 3: Increase kettlebell weight by one standard increment. Re-establish baseline time.',
+      'Week 4+: Alternate between chasing faster times and heavier loads each session.'
+    ]
+  }
+];
+
+// ===== STATE =====
+let state = {
+  currentRoutine: 0,
+  defaultRest: 60,
+  kettlebellWeight: 16,
+  soundOn: true,
+  workoutTimers: {}, // routineId -> seconds elapsed
+  workoutRunning: {}, // routineId -> bool
+  setProgress: {}, // routineId -> { exerciseIndex -> { setIndex -> done } }
+  customReps: {}, // routineId -> { exerciseIndex -> { setIndex -> reps } }
+  circuitProgress: {}, // routineId -> { round -> { exerciseIndex -> done } }
+  circuitRound: {}, // routineId -> current round
+  ladderProgress: {}, // routineId -> { rungIndex -> done }
+  eagleProgress: {}, // routineId -> { round -> { exerciseIndex -> done } }
+  eagleRound: {}, // routineId -> current round per hand
+  flowProgress: {}, // routineId -> { round -> { exerciseIndex -> done } }
+  flowRound: {} // routineId -> current round
+};
+
+// ===== LOAD/SAVE STATE =====
+function loadState() {
+  try {
+    const saved = localStorage.getItem('kbpro_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
     }
+  } catch (e) { console.warn('Could not load state', e); }
+}
 
-    function updateTimerDisplay() {
-      document.getElementById("timer").textContent =
-        formatTime(elapsedSeconds);
+function saveState() {
+  try {
+    localStorage.setItem('kbpro_state', JSON.stringify(state));
+  } catch (e) { console.warn('Could not save state', e); }
+}
+
+// ===== TIMER ENGINE =====
+let workoutInterval = null;
+let restInterval = null;
+let restRemaining = 0;
+let restTotal = 0;
+let restPaused = false;
+
+function startWorkoutTimer(routineId) {
+  state.workoutRunning[routineId] = true;
+  saveState();
+  if (workoutInterval) clearInterval(workoutInterval);
+  workoutInterval = setInterval(() => {
+    if (state.workoutRunning[routineId]) {
+      state.workoutTimers[routineId] = (state.workoutTimers[routineId] || 0) + 1;
+      updateWorkoutTimerDisplay();
+      saveState();
     }
+  }, 1000);
+  updateStartStopButton();
+}
 
-    function toggleTimer() {
-      const btn = document.getElementById("startPauseBtn");
-      if (timerRunning) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        btn.textContent = "Resume";
-        btn.classList.remove("running");
-        btn.classList.add("paused");
-      } else {
-        timerInterval = setInterval(() => {
-          elapsedSeconds++;
-          updateTimerDisplay();
-        }, 1000);
-        timerRunning = true;
-        btn.textContent = "Pause";
-        btn.classList.remove("paused");
-        btn.classList.add("running");
+function stopWorkoutTimer(routineId) {
+  state.workoutRunning[routineId] = false;
+  saveState();
+  if (workoutInterval) { clearInterval(workoutInterval); workoutInterval = null; }
+  updateStartStopButton();
+}
+
+function toggleWorkout() {
+  const r = ROUTINES[state.currentRoutine];
+  if (state.workoutRunning[r.id]) {
+    stopWorkoutTimer(r.id);
+    showToast('Workout paused', 'success');
+  } else {
+    startWorkoutTimer(r.id);
+    showToast('Workout started', 'success');
+  }
+}
+
+function updateWorkoutTimerDisplay() {
+  const r = ROUTINES[state.currentRoutine];
+  const seconds = state.workoutTimers[r.id] || 0;
+  const display = document.getElementById('workoutTimerValue');
+  if (display) {
+    display.textContent = formatTime(seconds);
+    display.classList.toggle('running', state.workoutRunning[r.id] || false);
+  }
+}
+
+function updateStartStopButton() {
+  const r = ROUTINES[state.currentRoutine];
+  const btn = document.getElementById('startStopBtn');
+  if (!btn) return;
+  const running = state.workoutRunning[r.id] || false;
+  btn.classList.toggle('running', running);
+  btn.innerHTML = running
+    ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg> Pause'
+    : '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Start';
+}
+
+// ===== REST TIMER =====
+function startRestTimer(seconds) {
+  restRemaining = seconds;
+  restTotal = seconds;
+  restPaused = false;
+  if (restInterval) clearInterval(restInterval);
+  document.getElementById('timerBar').classList.add('visible');
+  updateRestDisplay();
+  restInterval = setInterval(() => {
+    if (!restPaused) {
+      restRemaining--;
+      updateRestDisplay();
+      if (restRemaining <= 0) {
+        clearInterval(restInterval);
+        restInterval = null;
+        if (state.soundOn) playBeep();
+        document.getElementById('restTimerValue').classList.add('done');
+        document.getElementById('restProgressFill').classList.add('done');
+        showToast('Rest complete — go!', 'success');
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
       }
     }
+  }, 1000);
+}
 
-    function resetTimer() {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      elapsedSeconds = 0;
-      updateTimerDisplay();
-      const btn = document.getElementById("startPauseBtn");
-      btn.textContent = "Start";
-      btn.classList.remove("running", "paused");
-    }
+function updateRestDisplay() {
+  const valEl = document.getElementById('restTimerValue');
+  const fillEl = document.getElementById('restProgressFill');
+  valEl.textContent = formatTime(restRemaining);
+  valEl.classList.remove('done');
+  fillEl.classList.remove('done');
+  const pct = restTotal > 0 ? (restRemaining / restTotal) * 100 : 0;
+  fillEl.style.width = pct + '%';
+  // Update pause button icon
+  const pauseBtn = document.getElementById('restPauseBtn');
+  if (restPaused) {
+    pauseBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
+  } else {
+    pauseBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+  }
+}
 
-    // --- Workout Data ---
-    const workout = [
-      {
-        title: "Warm-Up",
-        rounds: 2,
-        exercises: [
-          {
-            name: "Single-Kettlebell Halo",
-            detail: "5-10 reps each direction",
-          },
-          { name: "Turkish Get Up", detail: "2 reps each side" },
-        ],
-      },
-      {
-        title: "CNS Prep",
-        rounds: 2,
-        exercises: [
-          { name: "Kettlebell Swing", detail: "5 reps" },
-          { name: "Basic Push-Ups", detail: "5 reps" },
-        ],
-      },
-      {
-        title: "Full Body Single-Kettlebell Workout",
-        rounds: 2,
-        exercises: [
-          { name: "Kettlebell Clean", detail: "5 reps each side" },
-          {
-            name: "Single-Rack Kettlebell Squat",
-            detail: "8 reps each side",
-          },
-          { name: "Kettlebell Push Press", detail: "5 reps each side" },
-        ],
-      },
-      {
-        title: "Conditioning Finisher",
-        rounds: 2,
-        exercises: [
-          {
-            name: "Kettlebell Clean, Squat, & Press",
-            detail: "3 reps each side",
-          },
-        ],
-      },
-    ];
+function toggleRestPause() {
+  restPaused = !restPaused;
+  updateRestDisplay();
+}
 
-    let roundCounts = workout.map((s) => s.rounds);
-    let state = buildState();
-    let activeRound = workout.map(() => 0);
+function adjustRest(delta) {
+  if (restRemaining > 0 || restPaused) {
+    restRemaining = Math.max(0, restRemaining + delta);
+    restTotal = Math.max(restRemaining, restTotal);
+    updateRestDisplay();
+  }
+}
 
-    function buildState() {
-      return workout.map((s, si) =>
-        Array.from({ length: roundCounts[si] }, () =>
-          Array(s.exercises.length).fill(false)
-        )
-      );
-    }
+function closeRestTimer() {
+  if (restInterval) { clearInterval(restInterval); restInterval = null; }
+  restRemaining = 0;
+  restPaused = false;
+  document.getElementById('timerBar').classList.remove('visible');
+}
 
-    function addRound(si) {
-      if (roundCounts[si] >= 10) return;
-      roundCounts[si]++;
-      state[si].push(Array(workout[si].exercises.length).fill(false));
-      render();
-    }
+// ===== SOUND =====
+let audioCtx = null;
+function playBeep() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.5);
+    // Second beep
+    setTimeout(() => {
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.frequency.value = 1100;
+      osc2.type = 'sine';
+      gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      osc2.start(audioCtx.currentTime);
+      osc2.stop(audioCtx.currentTime + 0.5);
+    }, 300);
+  } catch (e) { console.warn('Audio error', e); }
+}
 
-    function removeRound(si) {
-      if (roundCounts[si] <= 1) return;
-      roundCounts[si]--;
-      state[si].pop();
-      if (activeRound[si] >= roundCounts[si]) {
-        activeRound[si] = roundCounts[si] - 1;
-      }
-      render();
-    }
+// ===== UTILS =====
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
 
-    function render() {
-      const app = document.getElementById("app");
-      app.innerHTML = "";
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast visible ' + type;
+  setTimeout(() => toast.classList.remove('visible'), 2500);
+}
 
-      workout.forEach((section, si) => {
-        const div = document.createElement("div");
-        div.className = "section";
+// ===== RENDERING =====
+function renderNav() {
+  const nav = document.getElementById('routineNav');
+  nav.innerHTML = ROUTINES.map((r, i) =>
+    `<button class="routine-tab ${i === state.currentRoutine ? 'active' : ''}" onclick="selectRoutine(${i})">
+      <span class="tab-num">${r.num}</span> ${r.name.split(' ').slice(0, 2).join(' ')}
+    </button>`
+  ).join('');
+}
 
-        const header = document.createElement("div");
-        header.className = "section-header";
-        header.innerHTML = `
-          <span class="section-title">${section.title}</span>
-          <div class="round-controls">
-            <button
-              class="round-adj-btn"
-              onclick="removeRound(${si})"
-              ${roundCounts[si] <= 1 ? "disabled" : ""}
-            >−</button>
-            <span class="round-count">${roundCounts[si]} Round${roundCounts[si] > 1 ? "s" : ""}</span>
-            <button
-              class="round-adj-btn"
-              onclick="addRound(${si})"
-              ${roundCounts[si] >= 10 ? "disabled" : ""}
-            >+</button>
+function selectRoutine(index) {
+  state.currentRoutine = index;
+  saveState();
+  renderNav();
+  renderRoutine();
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderRoutine() {
+  const r = ROUTINES[state.currentRoutine];
+  const main = document.getElementById('main');
+
+  let exercisesHtml = '';
+
+  if (r.type === 'sets') {
+    exercisesHtml = renderSetsRoutine(r);
+  } else if (r.type === 'circuit') {
+    exercisesHtml = renderCircuitRoutine(r);
+  } else if (r.type === 'eagle') {
+    exercisesHtml = renderEagleRoutine(r);
+  } else if (r.type === 'flow') {
+    exercisesHtml = renderFlowRoutine(r);
+  } else if (r.type === 'ladder') {
+    exercisesHtml = renderLadderRoutine(r);
+  }
+
+  // Calculate progress
+  const progressPct = calculateProgress(r);
+
+  main.innerHTML = `
+    <div class="routine-view active">
+      <div class="routine-header">
+        <div class="routine-badge">${r.badge}</div>
+        <h1 class="routine-title">${r.name}</h1>
+        <p class="routine-subtitle">${r.subtitle}</p>
+        <div class="routine-meta">
+          <div class="meta-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${r.duration}
           </div>
-        `;
-        div.appendChild(header);
+          <div class="meta-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+            Rest: ${r.rest}
+          </div>
+          <div class="meta-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${r.frequency}
+          </div>
+          <div class="meta-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11v11h-11z" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="3"/></svg>
+            ${state.kettlebellWeight} kg
+          </div>
+        </div>
+      </div>
 
-        const tabs = document.createElement("div");
-        tabs.className = "round-tabs";
-        for (let r = 0; r < roundCounts[si]; r++) {
-          const tab = document.createElement("button");
-          tab.className = "round-tab";
-          tab.textContent = `Round ${r + 1}`;
-          if (r === activeRound[si]) tab.classList.add("active");
-          if (state[si][r].every(Boolean)) tab.classList.add("completed");
-          tab.addEventListener("click", () => {
-            activeRound[si] = r;
-            render();
-          });
-          tabs.appendChild(tab);
-        }
-        div.appendChild(tabs);
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-title">Session Progress</span>
+          <span class="progress-percent">${progressPct}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progressPct}%"></div>
+        </div>
+      </div>
 
-        const r = activeRound[si];
-        section.exercises.forEach((ex, ei) => {
-          const row = document.createElement("div");
-          row.className = "exercise" + (state[si][r][ei] ? " done" : "");
+      <div class="controls-bar">
+        <div class="workout-timer-display">
+          <span class="workout-timer-label">Workout Time</span>
+          <span class="workout-timer-value" id="workoutTimerValue">${formatTime(state.workoutTimers[r.id] || 0)}</span>
+        </div>
+        <button class="start-stop-btn" id="startStopBtn" onclick="toggleWorkout()"></button>
+      </div>
 
-          const cb = document.createElement("input");
-          cb.type = "checkbox";
-          cb.checked = state[si][r][ei];
-          cb.addEventListener("change", () => {
-            state[si][r][ei] = cb.checked;
-            if (cb.checked && !timerRunning && elapsedSeconds === 0) {
-              toggleTimer();
-            }
-            render();
-          });
+      <div class="exercise-list">
+        ${exercisesHtml}
+      </div>
 
-          const info = document.createElement("div");
-          info.className = "exercise-info";
-          info.innerHTML = `
-            <div class="exercise-name">${ex.name}</div>
-            <div class="exercise-detail">${ex.detail}</div>
-          `;
+      <div class="info-section">
+        <h3>Why This Works</h3>
+        <p>${r.why}</p>
+      </div>
 
-          row.appendChild(cb);
-          row.appendChild(info);
-          div.appendChild(row);
-        });
+      <div class="info-section">
+        <h3>Progression Protocol</h3>
+        <ul>
+          ${r.progression.map(p => `<li>${p}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `;
 
-        app.appendChild(div);
-      });
+  updateWorkoutTimerDisplay();
+  updateStartStopButton();
+  updateAllProgressDisplays(r);
+}
 
-      updateProgress();
+// ===== SETS ROUTINE (Routine 1) =====
+function renderSetsRoutine(r) {
+  if (!state.setProgress[r.id]) state.setProgress[r.id] = {};
+  if (!state.customReps[r.id]) state.customReps[r.id] = {};
+
+  return r.exercises.map((ex, ei) => {
+    const sets = ex.sets;
+    let setRows = '';
+    for (let s = 0; s < sets; s++) {
+      const done = state.setProgress[r.id][ei] && state.setProgress[r.id][ei][s];
+      const customReps = state.customReps[r.id][ei] && state.customReps[r.id][ei][s];
+      const repValue = customReps || ex.reps;
+      setRows += `
+        <div class="set-row">
+          <span class="set-label">Set ${s + 1}</span>
+          <div class="set-input-group">
+            <label>Reps</label>
+            <input type="text" class="set-input" value="${repValue}" onchange="updateCustomReps('${r.id}', ${ei}, ${s}, this.value)" inputmode="numeric">
+          </div>
+          <button class="rest-trigger" onclick="startRestTimer(${state.defaultRest})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Rest
+          </button>
+          <button class="set-check ${done ? 'done' : ''}" onclick="toggleSet('${r.id}', ${ei}, ${s})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      `;
     }
 
-    function updateProgress() {
-      let total = 0;
-      let checked = 0;
-      state.forEach((section) =>
-        section.forEach((round) =>
-          round.forEach((v) => {
-            total++;
-            if (v) checked++;
-          })
-        )
-      );
-      const pct = total ? (checked / total) * 100 : 0;
-      document.getElementById("progress").style.width = pct + "%";
-      if (pct === 100 && timerRunning) {
-        toggleTimer();
+    const allDone = state.setProgress[r.id][ei] && Object.keys(state.setProgress[r.id][ei]).length === sets;
+
+    return `
+      <div class="exercise-card ${allDone ? 'completed' : ''}" id="card-${ei}">
+        <div class="exercise-card-header" onclick="toggleCard(${ei})">
+          <div class="exercise-num">${ei + 1}</div>
+          <div class="exercise-info">
+            <div class="exercise-name">${ex.name}${ex.perSide ? ' <span style="color:var(--text-faint);font-size:0.75rem;font-weight:600">/ side</span>' : ''}</div>
+            <div class="exercise-notes">${ex.notes}</div>
+          </div>
+          <button class="exercise-toggle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="exercise-body">
+          <div class="exercise-detail">${ex.detail}</div>
+          <div class="set-tracker">${setRows}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== CIRCUIT ROUTINE (Routine 2) =====
+function renderCircuitRoutine(r) {
+  if (!state.circuitProgress[r.id]) state.circuitProgress[r.id] = {};
+  if (state.circuitRound[r.id] === undefined) state.circuitRound[r.id] = 1;
+  const currentRound = state.circuitRound[r.id];
+
+  const exercisesHtml = r.exercises.map((ex, ei) => {
+    const done = state.circuitProgress[r.id][currentRound] && state.circuitProgress[r.id][currentRound][ei];
+    return `
+      <div class="circuit-exercise">
+        <button class="circuit-check ${done ? 'done' : ''}" onclick="toggleCircuitExercise('${r.id}', ${currentRound}, ${ei})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="circuit-exercise-info">
+          <div class="circuit-exercise-name">${ex.name}</div>
+          <div class="circuit-exercise-reps">${ex.reps}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Exercise details (expandable)
+  const detailsHtml = r.exercises.map((ex, ei) => `
+    <div class="exercise-card" id="card-${ei}">
+      <div class="exercise-card-header" onclick="toggleCard(${ei})">
+        <div class="exercise-num">${ei + 1}</div>
+        <div class="exercise-info">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-notes">${ex.reps}</div>
+        </div>
+        <button class="exercise-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-detail">${ex.detail}</div>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="circuit-card">
+      <div class="circuit-round-display">
+        <div class="circuit-round-label">Current Round</div>
+        <div class="circuit-round-value">${currentRound} <span>/ ${r.totalRounds}</span></div>
+      </div>
+      <div class="circuit-exercises">${exercisesHtml}</div>
+      <div class="circuit-actions">
+        <button class="circuit-btn secondary" onclick="prevCircuitRound('${r.id}', ${r.totalRounds})">← Prev</button>
+        <button class="circuit-btn primary" onclick="nextCircuitRound('${r.id}', ${r.totalRounds})">Complete Round →</button>
+      </div>
+    </div>
+    ${detailsHtml}
+  `;
+}
+
+// ===== EAGLE ROUTINE (Routine 3) =====
+function renderEagleRoutine(r) {
+  if (!state.eagleProgress[r.id]) state.eagleProgress[r.id] = {};
+  if (state.eagleRound[r.id] === undefined) state.eagleRound[r.id] = 1;
+  const currentRound = state.eagleRound[r.id];
+
+  const exercisesHtml = r.exercises.map((ex, ei) => {
+    const done = state.eagleProgress[r.id][currentRound] && state.eagleProgress[r.id][currentRound][ei];
+    return `
+      <div class="circuit-exercise">
+        <button class="circuit-check ${done ? 'done' : ''}" onclick="toggleEagleExercise('${r.id}', ${currentRound}, ${ei})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="circuit-exercise-info">
+          <div class="circuit-exercise-name">${ex.name}</div>
+          <div class="circuit-exercise-reps">${ex.reps}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const detailsHtml = r.exercises.map((ex, ei) => `
+    <div class="exercise-card" id="card-${ei}">
+      <div class="exercise-card-header" onclick="toggleCard(${ei})">
+        <div class="exercise-num">${ei + 1}</div>
+        <div class="exercise-info">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-notes">${ex.reps}</div>
+        </div>
+        <button class="exercise-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-detail">${ex.detail}</div>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="circuit-card">
+      <div class="circuit-round-display">
+        <div class="circuit-round-label">Round (Per Hand)</div>
+        <div class="circuit-round-value">${currentRound} <span>/ ${r.totalRounds}+</span></div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-dim);text-align:center;margin-bottom:14px;line-height:1.5;">
+        Do not put the bell down. Complete the sequence on one hand, switch, and repeat.
+      </div>
+      <div class="circuit-exercises">${exercisesHtml}</div>
+      <div class="circuit-actions">
+        <button class="circuit-btn secondary" onclick="prevEagleRound('${r.id}')">← Prev</button>
+        <button class="circuit-btn primary" onclick="nextEagleRound('${r.id}')">Complete & Switch →</button>
+      </div>
+    </div>
+    ${detailsHtml}
+  `;
+}
+
+// ===== FLOW ROUTINE (Routine 4) =====
+function renderFlowRoutine(r) {
+  if (!state.flowProgress[r.id]) state.flowProgress[r.id] = {};
+  if (state.flowRound[r.id] === undefined) state.flowRound[r.id] = 1;
+  const currentRound = state.flowRound[r.id];
+
+  const exercisesHtml = r.exercises.map((ex, ei) => {
+    const done = state.flowProgress[r.id][currentRound] && state.flowProgress[r.id][currentRound][ei];
+    return `
+      <div class="circuit-exercise">
+        <button class="circuit-check ${done ? 'done' : ''}" onclick="toggleFlowExercise('${r.id}', ${currentRound}, ${ei})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="circuit-exercise-info">
+          <div class="circuit-exercise-name">${ex.name}</div>
+          <div class="circuit-exercise-reps">${ex.reps}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const detailsHtml = r.exercises.map((ex, ei) => `
+    <div class="exercise-card" id="card-${ei}">
+      <div class="exercise-card-header" onclick="toggleCard(${ei})">
+        <div class="exercise-num">${ei + 1}</div>
+        <div class="exercise-info">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-notes">${ex.reps}</div>
+        </div>
+        <button class="exercise-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-detail">${ex.detail}</div>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="circuit-card">
+      <div class="circuit-round-display">
+        <div class="circuit-round-label">Current Round</div>
+        <div class="circuit-round-value">${currentRound} <span>/ ${r.totalRounds}+</span></div>
+      </div>
+      <div class="circuit-exercises">${exercisesHtml}</div>
+      <div class="circuit-actions">
+        <button class="circuit-btn secondary" onclick="prevFlowRound('${r.id}')">← Prev</button>
+        <button class="circuit-btn primary" onclick="nextFlowRound('${r.id}')">Complete Round →</button>
+      </div>
+    </div>
+    ${detailsHtml}
+  `;
+}
+
+// ===== LADDER ROUTINE (Routine 5) =====
+function renderLadderRoutine(r) {
+  if (!state.ladderProgress[r.id]) state.ladderProgress[r.id] = {};
+
+  const rungsHtml = r.ladderRungs.map((reps, ri) => {
+    const done = state.ladderProgress[r.id][ri];
+    return `
+      <div class="ladder-rung ${done ? 'done' : ''}" onclick="toggleLadderRung('${r.id}', ${ri})">
+        <div class="ladder-rung-num">R${ri + 1}</div>
+        <div class="ladder-rung-reps">${reps}</div>
+      </div>
+    `;
+  }).join('');
+
+  const detailsHtml = r.exercises.map((ex, ei) => `
+    <div class="exercise-card" id="card-${ei}">
+      <div class="exercise-card-header" onclick="toggleCard(${ei})">
+        <div class="exercise-num">${ei + 1}</div>
+        <div class="exercise-info">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-notes">${ex.reps}</div>
+        </div>
+        <button class="exercise-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-detail">${ex.detail}</div>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="circuit-card">
+      <div class="circuit-round-display">
+        <div class="circuit-round-label">Descending Ladder</div>
+        <div class="circuit-round-value">220 <span>total reps</span></div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-dim);text-align:center;margin-bottom:14px;line-height:1.5;">
+        Alternate Goblet Squats and Swings. Tap each rung as you complete it.
+      </div>
+      <div class="ladder-progress">${rungsHtml}</div>
+      <div class="circuit-actions">
+        <button class="circuit-btn primary" onclick="startRestTimer(30)">Quick Rest (30s)</button>
+        <button class="circuit-btn secondary" onclick="resetLadder('${r.id}')">Reset Ladder</button>
+      </div>
+    </div>
+    ${detailsHtml}
+  `;
+}
+
+// ===== INTERACTION HANDLERS =====
+function toggleCard(index) {
+  const card = document.getElementById(`card-${index}`);
+  if (card) card.classList.toggle('expanded');
+}
+
+function toggleSet(routineId, exIndex, setIndex) {
+  if (!state.setProgress[routineId]) state.setProgress[routineId] = {};
+  if (!state.setProgress[routineId][exIndex]) state.setProgress[routineId][exIndex] = {};
+  if (state.setProgress[routineId][exIndex][setIndex]) {
+    delete state.setProgress[routineId][exIndex][setIndex];
+  } else {
+    state.setProgress[routineId][exIndex][setIndex] = true;
+    // Auto-start rest timer
+    startRestTimer(state.defaultRest);
+  }
+  saveState();
+  renderRoutine();
+}
+
+function updateCustomReps(routineId, exIndex, setIndex, value) {
+  if (!state.customReps[routineId]) state.customReps[routineId] = {};
+  if (!state.customReps[routineId][exIndex]) state.customReps[routineId][exIndex] = {};
+  state.customReps[routineId][exIndex][setIndex] = value;
+  saveState();
+}
+
+function toggleCircuitExercise(routineId, round, exIndex) {
+  if (!state.circuitProgress[routineId]) state.circuitProgress[routineId] = {};
+  if (!state.circuitProgress[routineId][round]) state.circuitProgress[routineId][round] = {};
+  if (state.circuitProgress[routineId][round][exIndex]) {
+    delete state.circuitProgress[routineId][round][exIndex];
+  } else {
+    state.circuitProgress[routineId][round][exIndex] = true;
+  }
+  saveState();
+  renderRoutine();
+}
+
+function nextCircuitRound(routineId, totalRounds) {
+  const current = state.circuitRound[routineId] || 1;
+  if (current < totalRounds) {
+    state.circuitRound[routineId] = current + 1;
+    startRestTimer(120); // 2 min rest between rounds
+  } else {
+    showToast('All rounds complete! Great work.', 'success');
+    stopWorkoutTimer(routineId);
+  }
+  saveState();
+  renderRoutine();
+}
+
+function prevCircuitRound(routineId, totalRounds) {
+  const current = state.circuitRound[routineId] || 1;
+  if (current > 1) state.circuitRound[routineId] = current - 1;
+  saveState();
+  renderRoutine();
+}
+
+function toggleEagleExercise(routineId, round, exIndex) {
+  if (!state.eagleProgress[routineId]) state.eagleProgress[routineId] = {};
+  if (!state.eagleProgress[routineId][round]) state.eagleProgress[routineId][round] = {};
+  if (state.eagleProgress[routineId][round][exIndex]) {
+    delete state.eagleProgress[routineId][round][exIndex];
+  } else {
+    state.eagleProgress[routineId][round][exIndex] = true;
+  }
+  saveState();
+  renderRoutine();
+}
+
+function nextEagleRound(routineId) {
+  const current = state.eagleRound[routineId] || 1;
+  state.eagleRound[routineId] = current + 1;
+  saveState();
+  renderRoutine();
+  showToast('Switch hands. Stay unbroken!', 'success');
+}
+
+function prevEagleRound(routineId) {
+  const current = state.eagleRound[routineId] || 1;
+  if (current > 1) state.eagleRound[routineId] = current - 1;
+  saveState();
+  renderRoutine();
+}
+
+function toggleFlowExercise(routineId, round, exIndex) {
+  if (!state.flowProgress[routineId]) state.flowProgress[routineId] = {};
+  if (!state.flowProgress[routineId][round]) state.flowProgress[routineId][round] = {};
+  if (state.flowProgress[routineId][round][exIndex]) {
+    delete state.flowProgress[routineId][round][exIndex];
+  } else {
+    state.flowProgress[routineId][round][exIndex] = true;
+  }
+  saveState();
+  renderRoutine();
+}
+
+function nextFlowRound(routineId) {
+  const current = state.flowRound[routineId] || 1;
+  state.flowRound[routineId] = current + 1;
+  startRestTimer(state.defaultRest);
+  saveState();
+  renderRoutine();
+}
+
+function prevFlowRound(routineId) {
+  const current = state.flowRound[routineId] || 1;
+  if (current > 1) state.flowRound[routineId] = current - 1;
+  saveState();
+  renderRoutine();
+}
+
+function toggleLadderRung(routineId, rungIndex) {
+  if (!state.ladderProgress[routineId]) state.ladderProgress[routineId] = {};
+  if (state.ladderProgress[routineId][rungIndex]) {
+    delete state.ladderProgress[routineId][rungIndex];
+  } else {
+    state.ladderProgress[routineId][rungIndex] = true;
+  }
+  saveState();
+  renderRoutine();
+}
+
+function resetLadder(routineId) {
+  state.ladderProgress[routineId] = {};
+  saveState();
+  renderRoutine();
+  showToast('Ladder reset', 'success');
+}
+
+// ===== PROGRESS CALCULATION =====
+function calculateProgress(r) {
+  let total = 0;
+  let done = 0;
+
+  if (r.type === 'sets') {
+    r.exercises.forEach((ex, ei) => {
+      total += ex.sets;
+      if (state.setProgress[r.id] && state.setProgress[r.id][ei]) {
+        done += Object.keys(state.setProgress[r.id][ei]).length;
       }
+    });
+  } else if (r.type === 'circuit') {
+    total = r.totalRounds * r.exercises.length;
+    if (state.circuitProgress[r.id]) {
+      Object.values(state.circuitProgress[r.id]).forEach(round => {
+        done += Object.keys(round).length;
+      });
     }
-
-    function resetAll() {
-      roundCounts = workout.map((s) => s.rounds);
-      state = buildState();
-      activeRound = workout.map(() => 0);
-      resetTimer();
-      render();
+  } else if (r.type === 'eagle') {
+    const maxRound = state.eagleRound[r.id] || 1;
+    total = maxRound * r.exercises.length;
+    if (state.eagleProgress[r.id]) {
+      Object.values(state.eagleProgress[r.id]).forEach(round => {
+        done += Object.keys(round).length;
+      });
     }
+  } else if (r.type === 'flow') {
+    const maxRound = state.flowRound[r.id] || 1;
+    total = maxRound * r.exercises.length;
+    if (state.flowProgress[r.id]) {
+      Object.values(state.flowProgress[r.id]).forEach(round => {
+        done += Object.keys(round).length;
+      });
+    }
+  } else if (r.type === 'ladder') {
+    total = r.ladderRungs.length;
+    if (state.ladderProgress[r.id]) {
+      done = Object.keys(state.ladderProgress[r.id]).length;
+    }
+  }
 
-    render();
-  </script>
+  return total > 0 ? Math.round((done / total) * 100) : 0;
+}
+
+function updateAllProgressDisplays(r) {
+  // Progress bar is rendered in template, no extra update needed
+}
+
+// ===== SETTINGS =====
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('visible');
+  // Update active states
+  document.querySelectorAll('.rest-preset').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.rest) === state.defaultRest);
+  });
+  document.querySelectorAll('.weight-selector [data-weight]').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.weight) === state.kettlebellWeight);
+  });
+  document.querySelectorAll('[data-sound]').forEach(btn => {
+    btn.classList.toggle('active', (btn.dataset.sound === 'on') === state.soundOn);
+  });
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('visible');
+}
+
+function resetAllProgress() {
+  if (confirm('Reset all workout progress? This cannot be undone.')) {
+    state.setProgress = {};
+    state.customReps = {};
+    state.circuitProgress = {};
+    state.circuitRound = {};
+    state.eagleProgress = {};
+    state.eagleRound = {};
+    state.flowProgress = {};
+    state.flowRound = {};
+    state.ladderProgress = {};
+    state.workoutTimers = {};
+    state.workoutRunning = {};
+    saveState();
+    closeSettings();
+    renderRoutine();
+    showToast('All progress reset', 'success');
+  }
+}
+
+// ===== INIT =====
+function init() {
+  loadState();
+
+  // Settings listeners
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('settingsModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeSettings();
+  });
+
+  document.querySelectorAll('.rest-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.defaultRest = parseInt(btn.dataset.rest);
+      saveState();
+      document.querySelectorAll('.rest-preset').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('[data-weight]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.kettlebellWeight = parseInt(btn.dataset.weight);
+      saveState();
+      document.querySelectorAll('[data-weight]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRoutine();
+    });
+  });
+
+  document.querySelectorAll('[data-sound]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.soundOn = btn.dataset.sound === 'on';
+      saveState();
+      document.querySelectorAll('[data-sound]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  renderNav();
+  renderRoutine();
+
+  // Resume workout timer if was running
+  const r = ROUTINES[state.currentRoutine];
+  if (state.workoutRunning[r.id]) {
+    startWorkoutTimer(r.id);
+  }
+
+  // PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'kbpro-v1';
+      self.addEventListener('install', e => self.skipWaiting());
+      self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, copy));
+            return res;
+          }).catch(() => caches.match(e.request)))
+        );
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  }
+
+  // Prevent body scroll when modal open
+  document.getElementById('settingsModal').addEventListener('touchmove', (e) => {
+    if (e.target === e.currentTarget) e.preventDefault();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
