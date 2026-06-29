@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#050505">
-    <title>Ladder Finisher</title>
+    <title>Kettlebell Master</title>
     
-    <!-- Custom Icon via Data URI -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050505'/%3E%3Crect x='20' y='20' width='12' height='60' fill='%23D0FF00'/%3E%3Crect x='40' y='35' width='12' height='45' fill='%23D0FF00'/%3E%3Crect x='60' y='50' width='12' height='30' fill='%23D0FF00'/%3E%3Crect x='80' y='65' width='12' height='15' fill='%23D0FF00'/%3E%3C/svg%3E">
+    <!-- Custom Premium App Icon (Kettlebell Silhouette) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050505'/%3E%3Cpath d='M30 35 Q50 10 70 35' stroke='%23D0FF00' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Crect x='35' y='40' width='30' height='45' rx='10' fill='%23D0FF00'/%3E%3C/svg%3E">
 
     <style>
         :root {
@@ -22,16 +23,16 @@
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none; user-select: none;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
             background-color: var(--bg);
-            background-image: linear-gradient(145deg, #050505 0%, #0f0f0f 100%);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 60%);
             color: var(--text);
             min-height: 100vh;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
@@ -39,246 +40,171 @@
         }
 
         .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 24px 20px 40px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            max-width: 480px; margin: 0 auto; padding: 24px 20px 40px;
+            display: flex; flex-direction: column; min-height: 100vh; position: relative;
         }
 
         /* Header */
         header {
-            margin-bottom: 30px;
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
         }
+        .header-titles { cursor: pointer; }
         h1 {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
         }
+        .chevron { font-size: 14px; color: var(--text-dim); transition: transform 0.3s ease; }
+        .header-titles:active .chevron { transform: rotate(180deg); }
+        
         .subtitle {
-            color: var(--text-dim);
-            font-size: 14px;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            color: var(--text-dim); font-size: 12px; margin-top: 4px;
+            letter-spacing: 1px; text-transform: uppercase;
         }
+        
+        .icon-btn {
+            background: var(--card-bg); border: 1px solid var(--border);
+            width: 40px; height: 40px; border-radius: 12px; color: var(--text);
+            font-size: 18px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.05); }
 
         /* Main UI */
         main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center;
         }
 
         .timer-display {
-            font-size: 48px;
-            font-weight: 300;
-            color: var(--text);
-            font-variant-numeric: tabular-nums;
-            margin-bottom: 40px;
-            letter-spacing: -1px;
+            font-size: 56px; font-weight: 200; color: var(--text);
+            font-variant-numeric: tabular-nums; margin-bottom: 30px; letter-spacing: -1px;
         }
 
         .workout-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px 24px;
-            width: 100%;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 24px; padding: 40px 24px; width: 100%;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            margin-bottom: 30px; position: relative; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
-        .round-info {
-            font-size: 12px;
-            color: var(--accent);
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
+        .step-info {
+            font-size: 12px; color: var(--accent); font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px;
         }
 
         .exercise-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-            min-height: 24px;
+            font-size: 20px; font-weight: 600; color: var(--text);
+            margin-bottom: 8px; min-height: 24px;
         }
 
         .rep-target {
-            font-size: 96px;
-            font-weight: 800;
-            color: var(--text);
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            transition: transform 0.2s ease;
+            font-size: 72px; font-weight: 800; color: var(--text);
+            line-height: 1; font-variant-numeric: tabular-nums;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
         }
-        
-        .rep-target.pulse {
-            transform: scale(1.1);
-            color: var(--accent);
-        }
+        .rep-target.small-text { font-size: 48px; } /* For text-heavy instructions */
+        .rep-target.pulse { transform: scale(1.1); color: var(--accent); }
 
-        .progress-dots {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-top: 32px;
+        .progress-track {
+            width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+            border-radius: 3px; margin-top: 32px; overflow: hidden;
         }
-
-        .dot {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            transition: background 0.3s ease;
-        }
-
-        .dot.active {
-            background: var(--accent);
-        }
-        .dot.completed {
-            background: rgba(208, 255, 0, 0.3);
+        .progress-fill {
+            height: 100%; background: var(--accent); border-radius: 3px;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px var(--accent);
         }
 
         /* Buttons */
+        .controls-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .btn {
-            width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
         .btn-primary {
-            background: var(--accent);
-            color: #000;
+            background: var(--accent); color: #000;
+            box-shadow: 0 10px 20px rgba(208, 255, 0, 0.15);
         }
-        
-        .btn-primary:active {
-            transform: scale(0.97);
-            opacity: 0.9;
-        }
-
+        .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
         .btn-secondary {
-            background: transparent;
-            color: var(--text-dim);
-            border: 1px solid var(--border);
-            margin-top: 12px;
+            background: transparent; color: var(--text-dim); border: 1px solid var(--border);
+        }
+        .btn-secondary:active { background: rgba(255,255,255,0.05); transform: scale(0.97); }
+        .hidden { display: none !important; }
+
+        /* Bottom Sheets */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); z-index: 90; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .bottom-sheet {
+            position: fixed; bottom: 0; left: 0; right: 0; background: #1c1c1e;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            padding: 24px 20px calc(env(safe-area-inset-bottom) + 24px);
+            z-index: 100; transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 85vh; overflow-y: auto;
+        }
+        .bottom-sheet.active { transform: translateY(0); }
+
+        .sheet-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+        }
+        .sheet-title { font-size: 20px; font-weight: 700; }
+        .close-btn {
+            background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            color: #fff; cursor: pointer;
         }
 
-        .btn-secondary:active {
-            background: rgba(255,255,255,0.05);
+        .routine-item {
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+            padding: 16px; border-radius: 16px; margin-bottom: 12px; cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .routine-item:active { background: rgba(255,255,255,0.05); }
+        .routine-item.selected { border-color: var(--accent); background: rgba(208, 255, 0, 0.05); }
+        .routine-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .routine-desc { font-size: 13px; color: var(--text-dim); }
 
-        .hidden {
-            display: none !important;
+        .info-block { margin-bottom: 24px; }
+        .info-block h3 {
+            font-size: 15px; color: var(--accent); margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-
-        /* Bottom Sections */
-        .info-section {
-            margin-top: 40px;
-            border-top: 1px solid var(--border);
-            padding-top: 20px;
-        }
-
-        details {
-            margin-bottom: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px 20px;
-        }
-
-        summary {
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        summary::after {
-            content: '+';
-            font-size: 18px;
-            color: var(--text-dim);
-        }
-        details[open] summary::after {
-            content: '-';
-        }
-
-        .info-content {
-            margin-top: 16px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--text-dim);
-        }
-        .info-content strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-        .info-content p {
-            margin-bottom: 12px;
-        }
+        .info-block p { font-size: 14px; line-height: 1.6; color: var(--text-dim); margin-bottom: 12px; }
+        .info-block p strong { color: var(--text); font-weight: 600; }
 
         .history-item {
-            background: rgba(255,255,255,0.02);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
+            background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .history-date { color: var(--text); font-weight: 500; }
-        .history-time { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 600; }
-        .history-status { font-size: 11px; text-transform: uppercase; color: var(--text-dim); }
+        .history-routine { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+        .history-date { color: var(--text); font-weight: 600; font-size: 15px; }
+        .history-time { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 16px; }
+        .history-status { font-size: 11px; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+        .empty-history { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 15px; }
 
         /* Completion Screen */
         .completion-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(5, 5, 5, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px);
+            z-index: 110; display: none; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
+            text-align: center; opacity: 0; transition: opacity 0.4s ease;
         }
-        .completion-screen.active {
-            display: flex;
-        }
-        .completion-title {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
+        .completion-screen.active { display: flex; opacity: 1; }
+        .completion-title { font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
+        .completion-subtitle { color: var(--text-dim); margin-bottom: 40px; }
         .completion-time {
-            font-size: 64px;
-            font-weight: 300;
-            color: var(--accent);
-            margin-bottom: 40px;
-            font-variant-numeric: tabular-nums;
+            font-size: 72px; font-weight: 200; color: var(--accent);
+            margin-bottom: 40px; font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
@@ -286,61 +212,76 @@
 
     <div class="app-container">
         <header>
-            <h1>Descending Ladder</h1>
-            <div class="subtitle">Fat Loss & Work Capacity</div>
+            <div class="header-titles" onclick="openSheet('routine-sheet')">
+                <h1><span id="header-routine-name">Descending Ladder</span> <span class="chevron">▼</span></h1>
+                <div class="subtitle" id="header-routine-sub">Fat Loss & Work Capacity</div>
+            </div>
+            <div class="icon-btn" onclick="openSheet('history-sheet')">⏱</div>
         </header>
 
         <main>
             <div class="timer-display" id="timer">00:00</div>
 
             <div class="workout-card">
-                <div class="round-info">ROUND <span id="round-num">1</span> / 10</div>
-                <div class="exercise-name" id="exercise-name">Ready to Begin</div>
-                <div class="rep-target" id="rep-target">20</div>
-                <div class="progress-dots" id="progress-dots"></div>
+                <div class="step-info" id="step-info">READY TO BEGIN</div>
+                <div class="exercise-name" id="exercise-name">Select Routine</div>
+                <div class="rep-target" id="rep-target">--</div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                </div>
             </div>
 
-            <button id="start-btn" class="btn btn-primary">Start Workout</button>
+            <div class="controls-container">
+                <button id="start-btn" class="btn btn-primary">Start Workout</button>
+                
+                <div id="active-controls" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
+                    <button id="next-btn" class="btn btn-primary">Complete Step</button>
+                    <button id="finish-btn" class="btn btn-secondary">Finish Early</button>
+                </div>
+            </div>
             
-            <div id="active-controls" class="hidden" style="width: 100%;">
-                <button id="next-btn" class="btn btn-primary">Complete Set</button>
-                <button id="finish-btn" class="btn btn-secondary">Finish Early</button>
+            <div style="margin-top: 30px; text-align: center;">
+                <button onclick="openSheet('info-sheet')" style="background: none; border: none; color: var(--text-dim); font-size: 14px; text-decoration: underline; cursor: pointer; padding: 8px;">View Protocol & Info</button>
             </div>
         </main>
+    </div>
 
-        <section class="info-section">
-            <details>
-                <summary>History & Progress</summary>
-                <div class="info-content" id="history-container">
-                    <p>No history yet. Complete your first session!</p>
-                </div>
-            </details>
+    <!-- Routine Selection Sheet -->
+    <div class="modal-overlay" id="routine-overlay" onclick="closeSheet('routine-sheet')"></div>
+    <div class="bottom-sheet" id="routine-sheet">
+        <div class="sheet-header">
+            <div class="sheet-title">Select Routine</div>
+            <div class="close-btn" onclick="closeSheet('routine-sheet')">✕</div>
+        </div>
+        <div id="routine-list-container"></div>
+    </div>
 
-            <details>
-                <summary>Protocol & Pacing</summary>
-                <div class="info-content">
-                    <p><strong>Format:</strong> Descending ladder from 20 to 2, subtracting 2 reps each round. Alternate between Goblet Squats and Kettlebell Swings. Rest only as necessary.</p>
-                    <p><strong>Movement Standard:</strong> Goblet squats must reach full depth (hip crease below knee). Kettlebell swings must reach chest height with a powerful hip snap. Do not sacrifice form for speed.</p>
-                    <p><strong>Pacing Strategy:</strong> The first four rounds (20, 18, 16, 14) are where most trainees fail by starting too aggressively. Begin at a sustainable pace. The final four rounds (8, 6, 4, 2) should be performed as fast as proper form allows.</p>
-                    <p><strong>Why This Works:</strong> The squat-to-swing pairing creates sustained heart-rate elevation. Research shows kettlebell protocols burn ~20 calories per minute and maintain 86-99% of max heart rate.</p>
-                </div>
-            </details>
+    <!-- History Sheet -->
+    <div class="modal-overlay" id="history-overlay" onclick="closeSheet('history-sheet')"></div>
+    <div class="bottom-sheet" id="history-sheet">
+        <div class="sheet-header">
+            <div class="sheet-title">History</div>
+            <div class="close-btn" onclick="closeSheet('history-sheet')">✕</div>
+        </div>
+        <div id="history-container">
+            <div class="empty-history">No history yet. Complete your first session!</div>
+        </div>
+    </div>
 
-            <details>
-                <summary>Progression Protocol</summary>
-                <div class="info-content">
-                    <p><strong>Week 1:</strong> Complete the full 20-to-2 ladder. Record total completion time.</p>
-                    <p><strong>Week 2:</strong> Target a 10% reduction in total completion time using the same weight.</p>
-                    <p><strong>Week 3:</strong> Increase kettlebell weight by one standard increment. Re-establish baseline time.</p>
-                    <p><strong>Week 4+:</strong> Alternate between chasing faster times and heavier loads each session.</p>
-                </div>
-            </details>
-        </section>
+    <!-- Info Sheet -->
+    <div class="modal-overlay" id="info-overlay" onclick="closeSheet('info-sheet')"></div>
+    <div class="bottom-sheet" id="info-sheet">
+        <div class="sheet-header">
+            <div class="sheet-title" id="info-sheet-title">Protocol Details</div>
+            <div class="close-btn" onclick="closeSheet('info-sheet')">✕</div>
+        </div>
+        <div id="info-content-container"></div>
     </div>
 
     <!-- Completion Screen -->
     <div class="completion-screen" id="completion-screen">
         <div class="completion-title">Workout Complete</div>
+        <div class="completion-subtitle" id="completion-subtitle">Full Routine Conquered</div>
         <div class="completion-time" id="final-time">00:00</div>
         <button class="btn btn-primary" style="max-width: 300px;" onclick="resetApp()">Save & Reset</button>
     </div>
@@ -348,73 +289,236 @@
     <!-- PWA Manifest Injection -->
     <script id="manifest-placeholder"></script>
     <script>
-        // 1. Generate Dynamic Manifest for PWA
+        // 1. Dynamic PWA Manifest
         const manifest = {
-            name: "Descending Ladder Finisher",
-            short_name: "Ladder Finisher",
+            name: "Kettlebell Master Routines",
+            short_name: "KB Master",
             display: "standalone",
             background_color: "#050505",
             theme_color: "#050505",
             icons: [{
-                src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050505'/%3E%3Crect x='20' y='20' width='12' height='60' fill='%23D0FF00'/%3E%3Crect x='40' y='35' width='12' height='45' fill='%23D0FF00'/%3E%3Crect x='60' y='50' width='12' height='30' fill='%23D0FF00'/%3E%3Crect x='80' y='65' width='12' height='15' fill='%23D0FF00'/%3E%3C/svg%3E",
-                sizes: "any",
-                type: "image/svg+xml",
-                purpose: "any maskable"
+                src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050505'/%3E%3Cpath d='M30 35 Q50 10 70 35' stroke='%23D0FF00' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Crect x='35' y='40' width='30' height='45' rx='10' fill='%23D0FF00'/%3E%3C/svg%3E",
+                sizes: "any", type: "image/svg+xml", purpose: "any maskable"
             }]
         };
         const stringManifest = JSON.stringify(manifest);
         const blob = new Blob([stringManifest], {type: 'application/json'});
         const manifestURL = URL.createObjectURL(blob);
-        document.querySelector('#manifest-placeholder').setAttribute('rel', 'manifest');
-        document.querySelector('#manifest-placeholder').setAttribute('href', manifestURL);
+        const manifestLink = document.querySelector('#manifest-placeholder');
+        manifestLink.setAttribute('rel', 'manifest');
+        manifestLink.setAttribute('href', manifestURL);
 
-        // 2. App State & Logic
+        // 2. Routine Data Generation
+        // Using generators to keep the data structure clean and scalable
+        
+        const routines = [
+            {
+                id: 1,
+                name: "Total-Body Strength Builder",
+                subtitle: "Max Strength & Muscle",
+                info: `
+                    <div class="info-block"><h3>Format</h3><p>~30 mins. 60-90s rest between sets. 3-4x per week. Targets every movement pattern: hinge, squat, push, pull, carry, and overhead stability.</p></div>
+                    <div class="info-block"><h3>Movement Notes</h3><p><strong>Turkish Get-Up:</strong> Move slowly with control; keep eyes on bell throughout.</p><p><strong>Swing Finisher:</strong> 50 reps total in as few sets as possible. Beginners: 5x10. Advanced: 2-3 sets.</p></div>
+                    <div class="info-block"><h3>Progression</h3><p><strong>Wks 1-2:</strong> Establish form. <strong>Wks 3-4:</strong> Reduce rest to 45-60s, add 2 reps to pressing. <strong>Wks 5-6:</strong> 50 swings in 2 sets. <strong>Wk 7+:</strong> Increase weight.</p></div>
+                    <div class="info-block"><h3>Why This Works</h3><p>The TGU provides comprehensive joint stability. Combined with bilateral/unilateral hinge, squat, and pulling, this is a complete gym strength session in one implement.</p></div>
+                `,
+                steps: (() => {
+                    let s = [];
+                    const add = (ex, reps, sets) => { for(let i=1; i<=sets; i++) s.push({ex, reps, info: `Set ${i} of ${sets}`}); };
+                    add("Turkish Get-Up", "5 / side", 2);
+                    add("Suitcase Deadlift", "6 / side", 3);
+                    add("Half-Kneeling Press", "8 / side", 3);
+                    add("Goblet Squat", "12 reps", 2);
+                    add("Bent-Over Row", "12 / side", 2);
+                    add("Farmer's Carry", "20 paces", 3);
+                    add("Kettlebell Swing", "50 reps total", 1);
+                    return s;
+                })()
+            },
+            {
+                id: 2,
+                name: "Spartan OCR Circuit",
+                subtitle: "Athletic Conditioning",
+                info: `
+                    <div class="info-block"><h3>Format</h3><p>25-30 mins. 5 Total Rounds. Rest 2 minutes between rounds. 2-3x per week.</p></div>
+                    <div class="info-block"><h3>Movement Notes</h3><p><strong>Clean & Press:</strong> Explosive clean to rack, strict press overhead without leg drive.</p><p><strong>Running Sub:</strong> If inside, do 45s high-knees, 100 jump rope turns, or 8 burpees.</p></div>
+                    <div class="info-block"><h3>Progression</h3><p><strong>Wks 1-2:</strong> 5 rounds base tempo. <strong>Wks 3-4:</strong> 90s rest. <strong>Wks 5-6:</strong> 60s rest, 3 C&P per side. <strong>Wk 7+:</strong> Add 6th round or increase weight.</p></div>
+                    <div class="info-block"><h3>Why This Works</h3><p>Combines ballistic power, strength under fatigue, leg endurance, and cardio. Mimics real-world tactical demands and OCR transitions.</p></div>
+                `,
+                steps: (() => {
+                    let s = [];
+                    for(let r=1; r<=5; r++) {
+                        s.push({ex: "200m Run", reps: "Moderate-Fast", info: `Round ${r} of 5`});
+                        s.push({ex: "Clean & Press", reps: "2 / side", info: `Round ${r} of 5`});
+                        s.push({ex: "Goblet Squat", reps: "5 reps", info: `Round ${r} of 5`});
+                        s.push({ex: "KB Swing", reps: "20 reps", info: `Round ${r} of 5`});
+                        if(r<5) s.push({ex: "Rest", reps: "2 Minutes", info: `Rest`});
+                    }
+                    return s;
+                })()
+            },
+            {
+                id: 3,
+                name: "One-Arm Flying Eagle",
+                subtitle: "Grip & Mental Toughness",
+                info: `
+                    <div class="info-block"><h3>Format</h3><p>20-25 mins. 3 Rounds per hand. DO NOT PUT THE BELL DOWN. Hand switch only.</p></div>
+                    <div class="info-block"><h3>Movement Notes</h3><p><strong>One-Arm Front Squat:</strong> Clean to rack, squat to full depth. Offset load creates anti-rotational demand.</p><p><strong>The "No-Rest" Rule:</strong> Bell cannot touch ground between first carry and final squat. If you fail, note the round.</p></div>
+                    <div class="info-block"><h3>Progression</h3><p><strong>Wk 1:</strong> 3 rounds/hand. <strong>Wk 2:</strong> 4 rounds/hand. <strong>Wk 3:</strong> 5 rounds/hand. <strong>Wk 4+:</strong> Increase carry to 25m or add 4th squat rep.</p></div>
+                    <div class="info-block"><h3>Why This Works</h3><p>Asymmetrical loading forces intense core engagement. Accumulation of carries + squats without rest builds exceptional grip endurance and leg strength under fatigue.</p></div>
+                `,
+                steps: (() => {
+                    let s = [];
+                    for(let r=1; r<=3; r++) {
+                        s.push({ex: "Suitcase Carry (L)", reps: "20 meters", info: `Round ${r} (Left)`});
+                        s.push({ex: "Front Squat (L)", reps: "1 rep", info: `Round ${r} (Left)`});
+                        s.push({ex: "Suitcase Carry (L)", reps: "20 meters", info: `Round ${r} (Left)`});
+                        s.push({ex: "Front Squat (L)", reps: "2 reps", info: `Round ${r} (Left)`});
+                        s.push({ex: "Suitcase Carry (L)", reps: "20 meters", info: `Round ${r} (Left)`});
+                        s.push({ex: "Front Squat (L)", reps: "3 reps", info: `Round ${r} (Left)`});
+                        
+                        s.push({ex: "Suitcase Carry (R)", reps: "20 meters", info: `Round ${r} (Right)`});
+                        s.push({ex: "Front Squat (R)", reps: "1 rep", info: `Round ${r} (Right)`});
+                        s.push({ex: "Suitcase Carry (R)", reps: "20 meters", info: `Round ${r} (Right)`});
+                        s.push({ex: "Front Squat (R)", reps: "2 reps", info: `Round ${r} (Right)`});
+                        s.push({ex: "Suitcase Carry (R)", reps: "20 meters", info: `Round ${r} (Right)`});
+                        s.push({ex: "Front Squat (R)", reps: "3 reps", info: `Round ${r} (Right)`});
+                    }
+                    return s;
+                })()
+            },
+            {
+                id: 4,
+                name: "Mastery Flow",
+                subtitle: "Technique & Movement Quality",
+                info: `
+                    <div class="info-block"><h3>Format</h3><p>25-30 mins. 3-4 Rounds. 60s rest between rounds. 3x per week.</p></div>
+                    <div class="info-block"><h3>Movement Notes</h3><p><strong>Halos:</strong> Keep bell close to head, move from shoulder girdle. Trains rotational control.</p><p><strong>Figure-8 Pass:</strong> Trace figure-8 through legs, stay low, chest up.</p></div>
+                    <div class="info-block"><h3>Progression</h3><p><strong>Wks 1-2:</strong> 3 rounds, lower reps. <strong>Wks 3-4:</strong> 4 rounds, upper reps. <strong>Wks 5-6:</strong> Add 2 reps to all. <strong>Wk 7+:</strong> Increase weight, drop to 3 rounds.</p></div>
+                    <div class="info-block"><h3>Why This Works</h3><p>Explicitly trains rotational control and anti-rotation, combined with fundamental strength. Develops movement literacy that transfers to cleans, snatches, and real-world demands.</p></div>
+                `,
+                steps: (() => {
+                    let s = [];
+                    for(let r=1; r<=3; r++) {
+                        s.push({ex: "Goblet Squat", reps: "8-12 reps", info: `Round ${r} of 3`});
+                        s.push({ex: "Split-Stance Row", reps: "8-12 / side", info: `Round ${r} of 3`});
+                        s.push({ex: "One-Arm Strict Press", reps: "6-10 / side", info: `Round ${r} of 3`});
+                        s.push({ex: "Chest-Loaded Swing", reps: "10 reps", info: `Round ${r} of 3`});
+                        s.push({ex: "Shoulder Halo", reps: "10 / direction", info: `Round ${r} of 3`});
+                        s.push({ex: "Hip Halo", reps: "10 / direction", info: `Round ${r} of 3`});
+                        s.push({ex: "Figure-8 Pass", reps: "10 / direction", info: `Round ${r} of 3`});
+                    }
+                    return s;
+                })()
+            },
+            {
+                id: 5,
+                name: "Descending Ladder",
+                subtitle: "Fat Loss & Work Capacity",
+                info: `
+                    <div class="info-block"><h3>Format</h3><p>15-20 mins. Descending ladder from 20 to 2 reps. Alternate Goblet Squats and Swings. Minimize rest.</p></div>
+                    <div class="info-block"><h3>Movement Notes</h3><p><strong>Standard:</strong> Squats must reach full depth. Swings must reach chest height with powerful hip snap. No partials.</p></div>
+                    <div class="info-block"><h3>Pacing Strategy</h3><p>First 4 rounds (20-14) are where most fail by starting too fast. Last 4 rounds (8-2) should be max effort.</p></div>
+                    <div class="info-block"><h3>Progression</h3><p><strong>Wk 1:</strong> Establish baseline time. <strong>Wk 2:</strong> 10% faster time. <strong>Wk 3:</strong> Heavier bell. <strong>Wk 4+:</strong> Alternate chasing speed vs load.</p></div>
+                `,
+                steps: (() => {
+                    let s = [];
+                    let reps = 20;
+                    for(let r=1; r<=10; r++) {
+                        s.push({ex: "Goblet Squats", reps: `${reps} reps`, info: `Round ${r} of 10`});
+                        s.push({ex: "KB Swings", reps: `${reps} reps`, info: `Round ${r} of 10`});
+                        reps -= 2;
+                    }
+                    return s;
+                })()
+            }
+        ];
+
+        // 3. App State
         const state = {
-            running: false,
-            currentRound: 0, // 0 to 9 (10 rounds)
-            currentExercise: 0, // 0 = Squats, 1 = Swings
-            startTime: 0,
+            routineId: 5,
+            currentStepIndex: 0,
             elapsed: 0,
-            timerInterval: null
+            startTime: 0,
+            timerInterval: null,
+            running: false
         };
 
-        const ladderReps = [20, 18, 16, 14, 12, 10, 8, 6, 4, 2];
-        const exercises = ["Goblet Squats", "Kettlebell Swings"];
-
-        // DOM Elements
+        // DOM References
         const timerEl = document.getElementById('timer');
-        const roundNumEl = document.getElementById('round-num');
+        const stepInfoEl = document.getElementById('step-info');
         const exerciseNameEl = document.getElementById('exercise-name');
         const repTargetEl = document.getElementById('rep-target');
-        const progressDotsEl = document.getElementById('progress-dots');
+        const progressFill = document.getElementById('progress-fill');
         const startBtn = document.getElementById('start-btn');
         const activeControls = document.getElementById('active-controls');
         const nextBtn = document.getElementById('next-btn');
         const finishBtn = document.getElementById('finish-btn');
         const completionScreen = document.getElementById('completion-screen');
+        const completionSubtitle = document.getElementById('completion-subtitle');
         const finalTimeEl = document.getElementById('final-time');
         const historyContainer = document.getElementById('history-container');
+        const routineListContainer = document.getElementById('routine-list-container');
+        const headerRoutineName = document.getElementById('header-routine-name');
+        const headerRoutineSub = document.getElementById('header-routine-sub');
+        const infoSheetTitle = document.getElementById('info-sheet-title');
+        const infoContentContainer = document.getElementById('info-content-container');
 
-        // Initialize Progress Dots
-        function initDots() {
-            progressDotsEl.innerHTML = '';
-            for(let i=0; i<10; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                progressDotsEl.appendChild(dot);
-            }
+        // 4. Core Logic
+        function getCurrentRoutine() {
+            return routines.find(r => r.id === state.routineId);
         }
 
-        function updateDots() {
-            const dots = document.querySelectorAll('.dot');
-            dots.forEach((dot, index) => {
-                dot.classList.remove('active', 'completed');
-                if (index < state.currentRound) {
-                    dot.classList.add('completed');
-                } else if (index === state.currentRound) {
-                    dot.classList.add('active');
-                }
-            });
+        function loadRoutine(id) {
+            state.routineId = id;
+            state.currentStepIndex = 0;
+            state.elapsed = 0;
+            state.running = false;
+            clearInterval(state.timerInterval);
+            
+            const r = getCurrentRoutine();
+            headerRoutineName.textContent = r.name;
+            headerRoutineSub.textContent = r.subtitle;
+            infoSheetTitle.textContent = r.name + " Details";
+            infoContentContainer.innerHTML = r.info;
+            
+            timerEl.textContent = "00:00";
+            startBtn.classList.remove('hidden');
+            activeControls.classList.add('hidden');
+            activeControls.style.display = 'none';
+            
+            updateUI();
+            renderRoutineList();
+            closeSheet('routine-sheet');
+        }
+
+        function updateUI() {
+            const r = getCurrentRoutine();
+            const step = r.steps[state.currentStepIndex];
+            const totalSteps = r.steps.length;
+            const progressPct = ((state.currentStepIndex) / totalSteps) * 100;
+
+            if (!state.running) {
+                stepInfoEl.textContent = "READY TO BEGIN";
+                exerciseNameEl.textContent = r.name;
+                repTargetEl.textContent = totalSteps; // Show total steps initially
+                repTargetEl.classList.remove('small-text');
+                progressFill.style.width = "0%";
+            } else {
+                stepInfoEl.textContent = step.info;
+                exerciseNameEl.textContent = step.ex;
+                repTargetEl.textContent = step.reps;
+                
+                // Dynamic font sizing for longer text
+                if(step.reps.length > 8) repTargetEl.classList.add('small-text');
+                else repTargetEl.classList.remove('small-text');
+
+                // Animate number change
+                repTargetEl.classList.add('pulse');
+                setTimeout(() => repTargetEl.classList.remove('pulse'), 300);
+
+                progressFill.style.width = `${progressPct}%`;
+            }
         }
 
         function formatTime(ms) {
@@ -432,135 +536,123 @@
             }, 100);
         }
 
-        function stopTimer() {
-            clearInterval(state.timerInterval);
-        }
-
-        function updateUI() {
-            if (state.currentRound >= 10) {
-                completeWorkout(true);
-                return;
-            }
-
-            const reps = ladderReps[state.currentRound];
-            const exercise = exercises[state.currentExercise];
-
-            roundNumEl.textContent = state.currentRound + 1;
-            exerciseNameEl.textContent = exercise;
-            
-            // Pulse animation on number change
-            repTargetEl.classList.add('pulse');
-            setTimeout(() => {
-                repTargetEl.textContent = reps;
-                setTimeout(() => repTargetEl.classList.remove('pulse'), 200);
-            }, 150);
-
-            updateDots();
-
-            // Haptic feedback
-            if (navigator.vibrate) navigator.vibrate(50);
-        }
+        function stopTimer() { clearInterval(state.timerInterval); }
 
         function startWorkout() {
             state.running = true;
-            state.currentRound = 0;
-            state.currentExercise = 0;
+            state.currentStepIndex = 0;
             state.elapsed = 0;
             
             startBtn.classList.add('hidden');
             activeControls.classList.remove('hidden');
+            activeControls.style.display = 'flex';
             
             startTimer();
             updateUI();
+            if (navigator.vibrate) navigator.vibrate(50);
         }
 
-        function nextSet() {
-            if (!state.running) return;
-
-            if (state.currentExercise === 0) {
-                // Move to Swings in the same round
-                state.currentExercise = 1;
+        function nextStep() {
+            const r = getCurrentRoutine();
+            if (state.currentStepIndex < r.steps.length - 1) {
+                state.currentStepIndex++;
+                updateUI();
+                if (navigator.vibrate) navigator.vibrate(30);
             } else {
-                // Move to next round, back to Squats
-                state.currentExercise = 0;
-                state.currentRound++;
+                completeWorkout(true);
             }
-
-            updateUI();
         }
 
         function completeWorkout(isComplete) {
+            if (!state.running) return;
             stopTimer();
             state.running = false;
             
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
 
             const finalTime = formatTime(state.elapsed);
             finalTimeEl.textContent = finalTime;
+            
+            if (isComplete) {
+                completionSubtitle.textContent = "Full Routine Conquered";
+            } else {
+                const r = getCurrentRoutine();
+                completionSubtitle.textContent = `Stopped at Step ${state.currentStepIndex + 1} / ${r.steps.length}`;
+            }
+            
             completionScreen.classList.add('active');
-
-            // Save to history
-            saveHistory(isComplete ? finalTime : `${finalTime} (Early)`, state.currentRound + 1, isComplete);
+            saveHistory(isComplete);
         }
 
         function resetApp() {
             completionScreen.classList.remove('active');
-            state.running = false;
-            state.currentRound = 0;
-            state.currentExercise = 0;
-            state.elapsed = 0;
-            
-            timerEl.textContent = "00:00";
-            exerciseNameEl.textContent = "Ready to Begin";
-            repTargetEl.textContent = "20";
-            roundNumEl.textContent = "1";
-            
-            activeControls.classList.add('hidden');
-            startBtn.classList.remove('hidden');
-            
-            initDots();
+            loadRoutine(state.routineId); // Reloads current routine fresh
         }
 
-        // History Management
-        function saveHistory(timeStr, roundsCompleted, completed) {
-            let history = JSON.parse(localStorage.getItem('ladderHistory')) || [];
+        // 5. History & Sheets
+        function saveHistory(completed) {
+            let history = JSON.parse(localStorage.getItem('kbHistory')) || [];
+            const r = getCurrentRoutine();
+            
             history.unshift({
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                time: timeStr,
-                rounds: roundsCompleted,
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                routine: r.name,
+                time: formatTime(state.elapsed),
+                step: state.currentStepIndex + 1,
+                totalSteps: r.steps.length,
                 completed: completed
             });
-            // Keep only last 10 sessions
-            if (history.length > 10) history.pop();
-            localStorage.setItem('ladderHistory', JSON.stringify(history));
+            
+            if (history.length > 15) history.pop();
+            localStorage.setItem('kbHistory', JSON.stringify(history));
             renderHistory();
         }
 
         function renderHistory() {
-            let history = JSON.parse(localStorage.getItem('ladderHistory')) || [];
+            let history = JSON.parse(localStorage.getItem('kbHistory')) || [];
             if (history.length === 0) {
-                historyContainer.innerHTML = "<p>No history yet. Complete your first session!</p>";
+                historyContainer.innerHTML = '<div class="empty-history">No history yet. Complete your first session!</div>';
                 return;
             }
 
             historyContainer.innerHTML = history.map(item => `
                 <div class="history-item">
                     <div>
+                        <div class="history-routine">${item.routine}</div>
                         <div class="history-date">${item.date}</div>
-                        <div class="history-status">${item.completed ? 'Complete' : `Stopped at Round ${item.rounds}`}</div>
+                        <div class="history-status">${item.completed ? 'Complete' : `Stopped at ${item.step}/${item.totalSteps}`}</div>
                     </div>
                     <div class="history-time">${item.time}</div>
                 </div>
             `).join('');
         }
 
-        // Event Listeners
+        function renderRoutineList() {
+            routineListContainer.innerHTML = routines.map(r => `
+                <div class="routine-item ${state.routineId === r.id ? 'selected' : ''}" onclick="loadRoutine(${r.id})">
+                    <div class="routine-name">${r.name}</div>
+                    <div class="routine-desc">${r.subtitle}</div>
+                </div>
+            `).join('');
+        }
+
+        function openSheet(id) {
+            document.getElementById(id).classList.add('active');
+            document.getElementById(id + '-overlay').classList.add('active');
+        }
+
+        function closeSheet(id) {
+            document.getElementById(id).classList.remove('active');
+            document.getElementById(id + '-overlay').classList.remove('active');
+        }
+
+        // 6. Event Listeners
         startBtn.addEventListener('click', startWorkout);
-        nextBtn.addEventListener('click', nextSet);
+        nextBtn.addEventListener('click', nextStep);
         finishBtn.addEventListener('click', () => completeWorkout(false));
 
-        // Initial Load
-        initDots();
+        // Initialize
+        loadRoutine(5); // Load Descending Ladder by default
         renderHistory();
     </script>
 </body>
